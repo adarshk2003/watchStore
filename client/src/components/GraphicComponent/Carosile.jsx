@@ -35,7 +35,7 @@ function Carousel() {
 
 
     return (
-        <div className="w-full h-96 top-10 px-7 relative flex flex-col justify-center group">
+        <div className="w-full h-96 top-10 px-7 relative flex flex-col justify-center -z-50 group">
             <div style={{ backgroundImage: `url(${slides[currentIndex].url})` }} className="w-full h-full bg-center bg-cover duration-500 rounded-md"></div>
 
             {/* left arrow */}

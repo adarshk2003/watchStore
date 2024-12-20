@@ -1,35 +1,82 @@
-const express = require('express');
-const router = express.Router();
-const Seller = require('../models/seller');
-const User = require('../models/user');
+const Seller = require('../db/models/seller'); 
+const { fileUpload } = require('../utils/fileUpload'); 
 
-// Handle Seller Form Submission
-exports.createSellerProfile = async (req, res) => {
+// Get seller details
+exports.getSellerData = async (req, res) => {
+    const { userId } = req.params;
     try {
-        const { businessName, businessAddress } = req.body;
-        const userId = req.params.userId;
-
-        // Find user and update isSeller flag
-        const user = await User.findById(userId);
-        user.isSeller = true;
-        await user.save();
-
-        // Create new seller profile
-        const newSeller = new Seller({ user: userId, businessName, businessAddress });
-        await newSeller.save();
-
-        res.status(201).json({ user, seller: newSeller });
+        const seller = await Seller.findOne({ userId: userId });
+        if (!seller) {
+            return res.status(404).json({ message: 'Seller not found' });
+        }
+        res.status(200).json(seller);
     } catch (error) {
-        res.status(500).json({ message: "Error creating seller", error });
+        console.error('Error fetching seller details:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-// Fetch User Data for Seller Form
-exports.getUserData = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.userId);
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching user data", error });
-    }
+// Create or update seller details
+exports.createSeller = (req, res) => {
+    fileUpload(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ message: err.message });
+        }
+
+        const { userId } = req.params;
+        const {
+            fullName, email, phoneNumber, businessName, businessType, businessAddress,
+            businessRegistrationNumber, website, shippingMethods, returnPolicy, shippingLocations,
+            sellerBio
+        } = req.body;
+
+        const logo = req.file ? req.file.path : null;
+
+        try {
+            let seller = await Seller.findOne({ userId: userId });
+            if (seller) {
+                // Update seller details
+                seller.fullName = fullName;
+                seller.email = email;
+                seller.phoneNumber = phoneNumber;
+                seller.businessName = businessName;
+                seller.businessType = businessType;
+                seller.businessAddress = businessAddress;
+                seller.businessRegistrationNumber = businessRegistrationNumber;
+                seller.website = website;
+                seller.shippingMethods = shippingMethods;
+                seller.returnPolicy = returnPolicy;
+                seller.shippingLocations = shippingLocations;
+                seller.sellerBio = sellerBio;
+                if (logo) {
+                    seller.logo = logo;
+                }
+                await seller.save();
+                res.status(200).json({ message: 'Seller profile updated successfully' });
+            } else {
+                // Create new seller
+                seller = new Seller({
+                    userId,
+                    fullName,
+                    email,
+                    phoneNumber,
+                    businessName,
+                    businessType,
+                    businessAddress,
+                    businessRegistrationNumber,
+                    website,
+                    shippingMethods,
+                    returnPolicy,
+                    shippingLocations,
+                    sellerBio,
+                    logo
+                });
+                await seller.save();
+                res.status(201).json({ message: 'Seller profile created successfully' });
+            }
+        } catch (error) {
+            console.error('Error creating/updating seller profile:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
 };

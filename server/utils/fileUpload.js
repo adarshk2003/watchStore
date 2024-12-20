@@ -1,58 +1,66 @@
 const dayjs = require('dayjs');
-const fs = require('fs').promises;
+const fs = require('fs');
 
-exports.fileUpload = async function (file, directory) {
-    console.log("fileupload function executed");
-
-    if (!file || !directory) {
-        throw new Error("File and directory parameters are required");
-    }
-
-    return new Promise(async (resolve, reject) => {
+exports.fileUpload = async function (files, directory) {
+    return new Promise((resolve, reject) => {
         try {
-            const mime_type = file.split(";")[0].split(":")[1].split("/")[1];
-            console.log("mime_type :", mime_type);
-
-            const allowedTypes = ['png', 'jpg', 'jpeg', 'mp4', 'pdf'];
-            if (!allowedTypes.includes(mime_type)) {
-                console.log("Invalid file type");
-                return reject("File size up to 100mb and Formats .png, .jpeg, .jpg, .mp4, .pdf are only allowed");
+            // Check if files is an array
+            if (!Array.isArray(files)) {
+                reject("Expected an array of files.");
+                return;
             }
 
-            console.log("file type allowed..");
+            // Create an array to hold the paths of uploaded files
+            let uploadedFilePaths = [];
 
-            const randomNum = String(Math.floor((Math.random() * 100)));
-            console.log("random number :", randomNum);
-            console.log("dayjs() :", dayjs());
+            // Process each file in the array
+            for (let file of files) {
+                let mime_type = file.split(';')[0].split(":")[1].split('/')[1];
+                console.log("mime_type : ", mime_type);
 
-            const sanitizedFileName = dayjs().format('YYYYMMDDHHmmss') + randomNum + "." + mime_type;
-            console.log("file_name :", sanitizedFileName);
+                if (mime_type === "png" || mime_type === "jpeg" || mime_type === "jpg" || mime_type === "mp4" || mime_type === "pdf" || mime_type === "webp") {
+                    console.log("Allowed file type...");
 
-            const upload_path = `upload/${directory}`;
-            console.log("upload_path :", upload_path);
+                    let file_name = dayjs().format("YYYYMMDDHHmmss") + String(Math.floor(Math.random() * 100)) + "." + mime_type;
+                    console.log("file_name : ", file_name);
 
-            const base64 = file.split(';base64,')[1];
+                    let upload_path = `uploads/${directory}`;
+                    console.log("upload_path : ", upload_path);
 
-            try {
-                await fs.mkdir(upload_path, { recursive: true });
-            } catch (err) {
-                console.log("err : ", err);
-                return reject(err.message ? err.message : err);
+                    let base64 = file.split(';base64,')[1];
+
+                    fs.mkdir(upload_path, { recursive: true }, (err) => {
+                        if (err) {
+                            console.log("err : ", err);
+                            reject(err.message ? err.message : err);
+                        } else {
+                            let filePath = `${upload_path}/${file_name}`;
+                            console.log("filePath : ", filePath);
+
+                            fs.writeFile(filePath, base64, { encoding: "base64" }, function (err) {
+                                if (err) {
+                                    console.log("err : ", err);
+                                    reject(err.message ? err.message : err);
+                                } else {
+                                    uploadedFilePaths.push(filePath);
+                                    if (uploadedFilePaths.length === files.length) {
+                                        resolve(uploadedFilePaths);
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    console.log("Invalid file type");
+                    reject("File size up to 100mb and Formats .png, .jpeg, .jpg, .mp4, .webp, .pdf are only allowed");
+                    return;
+                }
             }
 
-            const final_upload_path = `${upload_path}/${sanitizedFileName}`;
-            console.log("final_upload_path :", final_upload_path);
-
-            try {
-                await fs.writeFile(final_upload_path, base64, { encoding: 'base64' });
-                resolve(final_upload_path);
-            } catch (err) {
-                console.log("err : ", err);
-                reject(err.message ? err.message : err);
-            }
         } catch (error) {
-            console.log(error);
+            console.log("error : ", error);
             reject(error.message ? error.message : error);
         }
     });
-};
+}

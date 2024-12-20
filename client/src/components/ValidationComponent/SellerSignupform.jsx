@@ -1,45 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useParams and useNavigate
+import axios from 'axios';
 
 function SellerSignUpForm() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    businessName: '',
-    businessType: '',
-    businessAddress: '',
-    businessRegistrationNumber: '',
-    website: '',
-    shippingMethods: '',
-    returnPolicy: '',
-    shippingLocations: '',
-    sellerBio: '',
-    logo: null,
-  });
+  const { userId } = useParams(); 
+  const navigate = useNavigate(); 
+  const [formData, setFormData] = useState({ 
+    fullName: '', 
+    email: '', 
+    phoneNumber: '', 
+    businessName: '', 
+    businessType: '', 
+    businessAddress: '', 
+    businessRegistrationNumber: '', 
+    website: '', 
+    shippingMethods: '', 
+    returnPolicy: '', 
+    shippingLocations: '', 
+    sellerBio: '', 
+    logo: null, 
+  }); 
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'logo') {
-      setFormData({
-        ...formData,
-        [name]: files[0]
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
+  useEffect(() => {
+    // Fetch user data to pre-fill form 
+    const fetchUserData = async () => {
+      try { 
+        const response = await axios.get(`http://localhost:7000/seller/${userId}`); 
+        setFormData((prevState) => ({ 
+          ...prevState, 
+          fullName: response.data.name, 
+          email: response.data.email 
+        }));
+      } catch (error) {
+        console.error('Error fetching user data:', error); 
+      } 
+    }; 
+    fetchUserData(); 
+  }, [userId]);
+
+  const handleChange = (e) => { 
+    const { name, value, files } = e.target; 
+    if (name === 'logo') { 
+      setFormData({ ...formData, [name]: files[0] });
+    } else { 
+      setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
-    // Handle form submission, e.g., send formData to the backend
+    try { 
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => { 
+        formDataToSend.append(key, formData[key]); 
+      }); 
+      await axios.post(`http://localhost:7000/seller/${userId}`, formDataToSend, {
+        headers: { 
+          'Content-Type': 'multipart/form-data' 
+        } 
+      }); 
+      navigate('/seller-dashboard');
+    } catch (error) {
+      console.error('Error creating seller profile:', error); 
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 max-w-2xl mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-6  text-emerald-900">Seller Sign-Up</h2>
+      <h2 className="text-2xl font-bold mb-6 text-emerald-900">Seller Sign-Up</h2>
 
       {/* Personal Information */}
       <div className="mb-4">
@@ -185,7 +213,6 @@ function SellerSignUpForm() {
           name="logo"
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded-lg"
-          multiple
         />
       </div>
 

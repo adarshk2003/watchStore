@@ -1,83 +1,120 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { addToCart } from './cartUtil';
 
-const productData = {
-  id: 1,
-  bestSeller:"best Seller",
-  name: "Titan Neo Splash Quartz Multifunction Black Dial Stainless Steel Strap",
-  category: "mens watch",
-  price: 2000.00,
-  img1: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw65f44689/images/Titan/Catalog/1805QM04_2.jpg?sw=600&sh=600",
-  img2: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw5edbbb63/images/Titan/Catalog/1805QM04_5.jpg?sw=600&sh=600",
-  img3: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwa418c108/images/Titan/Catalog/1805QM04_4.jpg?sw=600&sh=600",
-  img4: "https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwb7513c89/images/Titan/Catalog/1805QM04_6.jpg?sw=600&sh=600"
-};
-
-const ProductPage = () => {
-  const [product, setProduct] = useState(null);
-  const [activeImg, setActiveImage] = useState("");
-  const [amount, setAmount] = useState(1);
+function ProductPage() {
+  const { id } = useParams();
+  const [product, setProduct] = useState({
+    title: "",
+    description: "",
+    category: "",
+    price: "",
+    stock: "",
+    model: "",
+    caseMaterial: "",
+    dial: "",
+    bracelet: "",
+    movement: "",
+    power: "",
+    waterResistance: "",
+    crystal: "",
+    brand: "",
+    product_images: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [mainImage, setMainImage] = useState("");
 
   useEffect(() => {
-    // Use the local product data
-    setProduct(productData);
-    setActiveImage(productData.img1);
-  }, []);
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`http://localhost:7000/product/${id}`);
+        const fetchedProduct = response.data;
+        setProduct(fetchedProduct);
+        if (fetchedProduct.product_images && fetchedProduct.product_images.length > 0) {
+          setMainImage(fetchedProduct.product_images[0]);
+        }
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data?.message || err.message || "Something went wrong");
+        setLoading(false);
+      }
+    };
 
-  if (!product) {
-    return <div>Loading...</div>; // Show loading state while fetching data
-  }
+    fetchProduct();
+  }, [id]);
 
-  const images = [product.img1, product.img2, product.img3, product.img4];
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className='flex flex-col justify-between lg:flex-row gap-16 lg:items-center'>
-      <div className='flex flex-col gap-6 lg:w-2/4'>
-        <img src={activeImg} alt="Active" className='w-full h-full aspect-square object-cover rounded-xl cursor-pointer'/>
-        <div className='flex flex-row justify-between h-24'>
-          {images.map((img, index) => (
-            <img 
-              key={index} 
-              src={img} 
-              alt={`Product ${index + 1}`} 
-              className='w-24 h-24 rounded-md cursor-pointer' 
-              onClick={() => setActiveImage(img)} 
+    <div className="flex flex-col lg:flex-row gap-16 lg:items-start p-6">
+      {/* Left Section: Images */}
+      <div className="flex flex-col lg:w-1/2 gap-4">
+        <img
+          src={`http://localhost:7000/${mainImage}`}
+          alt={product.title}
+          className="w-full h-auto object-cover rounded-lg shadow-lg"
+        />
+        <div className="flex flex-row gap-4">
+          {product.product_images.map((img, index) => (
+            <img
+              key={index}
+              src={`http://localhost:7000/${img}`}
+              alt={`Product ${index + 1}`}
+              className="w-24 h-24 object-cover rounded-md cursor-pointer border"
+              onClick={() => setMainImage(img)}
             />
           ))}
         </div>
       </div>
-      {/* ABOUT */}
-      <div className='flex flex-col gap-4 lg:w-2/4'>
-        <div>
-          <span className='font-semibold text-emerald-800   '>{product.bestSeller}</span>
-          <h1 className='text-3xl font-bold'>{product.name}</h1>
-        </div>
-        <p className='text-gray-700'>
-          {product.category}
-        </p>
-        <h6 className='text-2xl font-semibold'>${product.price.toFixed(2)}</h6>
-        <div className='flex flex-row items-center gap-12'>
-          <div className='flex flex-row items-center'>
-            <button 
-              className='bg-gray-200 py-2 px-5 rounded-lg text-emerald-800 text-3xl' 
-              onClick={() => setAmount(amount > 1 ? amount - 1 : 1)}
-            >
-              -
-            </button>
-            <span className='py-4 px-6 rounded-lg'>{amount}</span>
-            <button 
-              className='bg-gray-200 py-2 px-4 rounded-lg text-emerald-800 text-3xl' 
-              onClick={() => setAmount(amount + 1)}
-            >
-              +
-            </button>
-          </div>
-          <button className='bg-emerald-900 text-white font-semibold py-3 px-16 rounded-xl h-full'>
-            Add to Cart
+
+      {/* Right Section: Details */}
+      <div className="flex flex-col lg:w-1/2 gap-6">
+        <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
+        <h2 className="text-lg text-gray-600">Brand: {product.brand}</h2>
+        <p className="text-gray-700">{product.description}</p>
+
+        <ul className="text-sm text-gray-700">
+          <li><strong>Category:</strong> {product.category}</li>
+          <li><strong>Model:</strong> {product.model}</li>
+          <li><strong>Case Material:</strong> {product.caseMaterial}</li>
+          <li><strong>Dial:</strong> {product.dial}</li>
+          <li><strong>Bracelet:</strong> {product.bracelet}</li>
+          <li><strong>Movement:</strong> {product.movement}</li>
+          <li><strong>Power Reserve:</strong> {product.power}</li>
+          <li><strong>Water Resistance:</strong> {product.waterResistance}</li>
+          <li><strong>Crystal:</strong> {product.crystal}</li>
+        </ul>
+
+        <div className="flex items-center gap-4">
+          <h3 className="text-2xl font-semibold text-emerald-800">€{product.price}</h3>
+          <button
+            onClick={() => {
+              if (product.stock > 0) {
+                addToCart(product.id);
+                toast.success("Added to cart");
+              } else {
+                toast.error("Out of stock");
+              }
+            }}
+            className={`px-6 py-3 rounded-lg text-white font-bold ${
+              product.stock > 0 ? "bg-emerald-900 hover:bg-emerald-700" : "bg-gray-400 cursor-not-allowed"
+            }`}
+            disabled={product.stock <= 0}
+          >
+            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
           </button>
         </div>
+
+        <p className={`text-sm font-semibold ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
+          {product.stock > 0 ? `${product.stock} in stock` : "Currently unavailable"}
+        </p>
       </div>
     </div>
   );
-};
+}
 
 export default ProductPage;

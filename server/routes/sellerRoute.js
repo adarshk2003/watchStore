@@ -1,11 +1,8 @@
 const express = require('express');
+const sellerController = require('../controller/sellerController');
 const router = express.Router();
-const sellerController = require('../controllers/sellerController');
 
-// Seller form submission route
-router.post('/seller-form/:userId', sellerController.createSellerProfile);
-
-// Route to get user data
-router.get('/seller-form/:userId', sellerController.getUserData);
+router.post('/seller/:userId', sellerController.createSeller);
+router.get('/seller/:userId', sellerController.getSellerData);
 
 module.exports = router;
