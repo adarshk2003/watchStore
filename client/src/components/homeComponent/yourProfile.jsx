@@ -90,6 +90,17 @@ const Profile = () => {
     );
   }
 
+  const userTypeDisplay = (type) => {
+    switch (type) {
+      case '675870f3ae9c6b1dffa1a7ee':
+        return <span className="text-yellow-300">Seller</span>;
+      case '675870dbae9c6b1dffa1a7ed':
+        return <span className="text-red-500">Admin</span>;
+      default: // Default to Customer
+        return <span className="text-blue-300">Customer</span>;
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 text-black shadow-lg rounded-lg mt-10 text-center">
       <h1 className="text-3xl font-semibold mb-6">
@@ -148,13 +159,7 @@ const Profile = () => {
 
         <div className="flex justify-between gap-6">
           <label className="block font-medium">Account Type :</label>
-          <div className="font-semibold">
-            {userData.user_type === '675870f3ae9c6b1dffa1a7ee' ? (
-              <span className="text-yellow-300">Seller</span>
-            ) : (
-              <span className="text-blue-300">Customer</span>
-            )}
-          </div>
+          <div className="font-semibold">{userTypeDisplay(userData.user_type)}</div>
         </div>
       </div>
 

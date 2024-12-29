@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBars, faHome, faExplosion, faUser, faShop, faListAlt } from '@fortawesome/free-solid-svg-icons';
-import ProfileDropdownseller from './ProfileDropdownseller';
+import { faSearch, faBars, faHome, faTachometerFast, faUser,faListAlt,faWarning, faBell} from '@fortawesome/free-solid-svg-icons';
+import ProfileDropdownAdmin from './ProfileDropdownAdmin';
+import NotificationPage from './Notifications';
 import axios from 'axios';
-function NavSeller() {
+function NavAdmin() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userName, setUserName] = useState('');
   useEffect(() => {
@@ -36,14 +37,14 @@ function NavSeller() {
     <>
       <div className="hidden md:flex justify-end w-full backdrop-blur-sm py-2 px-8 bg-slate-100 text-black">
         <div className="relative hidden md:flex">
-          <i className="absolute left-3 top-1">
+          {/* <i className="absolute left-3 top-1">
             <FontAwesomeIcon icon={faSearch} />
           </i>
           <input
             type="text"
             placeholder="search "
             className="py-1 pl-10 rounded-xl border-1 outline-none border-green-400 focus:bg-slate-200"
-          />
+          /> */}
           {userName ? (
             <div className="flex items-center ml-4">
               <span className="ml-2 ">{userName}</span>
@@ -66,20 +67,13 @@ function NavSeller() {
           <h1 className="hover:scale-105 transition-all font-russo-one text-2xl hover:text-emerald-800">CLYRO</h1>
         </a>
         <ul className="hidden md:flex items-center gap-10 font-semibold text-base">
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">home</li>
-          <Link to='/myproducts'><li className="hover:underline hover:text-emerald-800 cursor-pointer ">My products</li></Link>
-           <Link to='/dashboard-seller'><li className="hover:underline hover:text-emerald-800 cursor-pointer">explore</li></Link>
-          <Link to='/addproduct'><li className="hover:underline hover:text-emerald-800 cursor-pointer">Add product</li></Link>
+          <Link to='/alluser'><li className="hover:underline hover:text-emerald-800 cursor-pointer ">users</li></Link>
+           <li className="hover:underline hover:text-emerald-800 cursor-pointer">dashboard</li>
+          <li className="hover:underline hover:text-emerald-800 cursor-pointer"><NotificationPage/></li>
         </ul>
         <div className="flex items-center justify-center">
-          {/* <Link to='/wishlist'><li className="list-none m-2 cursor-pointer">
-            <FontAwesomeIcon icon={faHeart} />
-          </li></Link>
-          <Link to='/cart'><li className="list-none m-2 cursor-pointer">
-            <FontAwesomeIcon icon={faBagShopping} />
-          </li></Link> */}
           <li className="hidden lg:block list-none m-2 cursor-pointer">
-            <ProfileDropdownseller />
+            <ProfileDropdownAdmin />
           </li>
         </div>
         <i className="md:hidden block text-3xl cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -92,13 +86,16 @@ function NavSeller() {
             <FontAwesomeIcon icon={faHome} /> Home
           </li>
           <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faListAlt} /> My product
+            <FontAwesomeIcon icon={faListAlt} /> users
           </li>
           <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faExplosion} /> Explore
+            <FontAwesomeIcon icon={faTachometerFast} /> dashboard
           </li>
           <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faShop} />Add product
+            <FontAwesomeIcon icon={faWarning} /> security
+          </li>
+          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+            <FontAwesomeIcon icon={faBell} /> notification
           </li>
           <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
             <FontAwesomeIcon icon={faUser} /> Login
@@ -110,4 +107,4 @@ function NavSeller() {
   );
 }
 
-export default NavSeller;
+export default NavAdmin;

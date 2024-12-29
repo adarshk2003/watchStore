@@ -1,7 +1,9 @@
 const users = require('../db/models/user');
+const mongoose = require('mongoose');
 const success_function = require('../utils/response-handler').success_function;
 const error_function = require('../utils/response-handler').error_function;
 const bcrypt = require('bcryptjs');
+
 const user_type=require('../db/models/user_type')
 const fileUpload = require('../utils/fileUpload').fileUpload;
 
@@ -331,3 +333,56 @@ exports.updateUser = [authenticate, async function (req, res) {
         res.status(response.statusCode).send(response);
     }
 }];
+
+exports.blockUser = [
+    authenticate, // Middleware for authentication
+    async function (req, res) {
+      const { userId } = req.body; // Extracting userId from the request body
+  
+      // Validate userId format
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: 'Invalid user ID format.' });
+      }
+      try {
+        // Attempt to update the user's block status
+        const user = await users.findByIdAndUpdate(userId, { isBlocked: true }, { new: true });
+        if (!user) {
+          // User not found
+          return res.status(404).json({ message: 'User not found.' });
+        }
+        // Successful response
+        res.status(200).json({ message: 'User blocked successfully.', user });
+        console.log("user blocked successfully",user);
+      } catch (error) {
+        console.error('Error blocking user:', error);
+        res.status(500).json({ message: 'Error blocking user.', error: error.message });
+      }
+    }
+  ];
+  
+  // Unblock User
+  exports.unblockUser = [
+    authenticate, // Middleware for authentication
+    async function (req, res) {
+      const { userId } = req.body;
+  
+      // Validate userId format
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: 'Invalid user ID format.' });
+      }
+  
+      try {
+        // Attempt to update the user's block status
+        const user = await users.findByIdAndUpdate(userId, { isBlocked: false }, { new: true });
+        if (!user) {
+          // User not found
+          return res.status(404).json({ message: 'User not found.' });
+        }
+        // Successful response
+        res.status(200).json({ message: 'User unblocked successfully.', user });
+      } catch (error) {
+        console.error('Error unblocking user:', error);
+        res.status(500).json({ message: 'Error unblocking user.', error: error.message });
+      }
+    }
+  ];

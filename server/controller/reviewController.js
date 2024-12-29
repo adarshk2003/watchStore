@@ -1,53 +1,61 @@
 const Review = require('../db/models/review');
-const Product = require('../db/models/product');
-const { success_function, error_function } = require('../utils/response-handler');
 
-exports.addReview = async (req, res) => {
-    try {
-        const { productId, rating, review } = req.body;
+const jwt = require('jsonwebtoken');
 
-        // Validate input
-        if (!productId || !rating || rating < 1 || rating > 5) {
-            return res.status(400).send(error_function({
-                statusCode: 400,
-                message: 'Valid Product ID, rating (1-5), and review text are required.'
-            }));
-        }
+const authenticate = (req, res, next) => {
+    const authorizationHeader = req.header('Authorization');
+    console.log("Authorization Header:", authorizationHeader);
 
-        // Check if the user has already reviewed this product
-        const existingReview = await Review.findOne({ product: productId, user: req.user._id });
-        if (existingReview) {
-            return res.status(400).send(error_function({
-                statusCode: 400,
-                message: 'You have already reviewed this product.'
-            }));
-        }
+    // Extract token from header
+    const token = authorizationHeader?.replace(/^Bearer\s+/i, '').trim();
+    console.log("Extracted Token:", token);
 
-        // Create a new review
-        const newReview = await Review.create({
-            product: productId,
-            user: req.user._id, // Assuming user is authenticated
-            rating,
-            review,
-        });
-
-        // Optionally update product rating (if needed)
-        const product = await Product.findById(productId);
-        if (product) {
-            const reviews = await Review.find({ product: productId });
-            const avgRating = reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length;
-            product.rating = avgRating;
-            await product.save();
-        }
-
-        res.status(201).json({
-            message: "Review added successfully",
-            data: newReview,
-        });
-    } catch (error) {
-        console.error('Error adding review:', error);
-        res.status(500).json({
-            message: "Error adding review: " + error.message,
-        });
+    if (!token) {
+        return res.status(401).json({ message: "No token provided. Please log in." });
     }
+
+    try {
+        const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
+        req.user = { id: decoded.user_id }; // Add user ID to the request
+        console.log("Decoded User ID:", req.user.id);
+        next(); // Proceed to the next middleware/controller
+    } catch (error) {
+        console.error("Token Verification Error:", error.message);
+        return res.status(401).json({ message: 'Invalid or expired token.' });
+    }
+};
+
+
+// Add a review
+exports.addReview =[authenticate, async (req, res) => {
+  try {
+    const { productId, rating, comment } = req.body;
+    const userId = req.user.id; // Assuming user is authenticated
+
+    const newReview = new Review({
+      productId,
+      userId,
+      rating,
+      comment
+    });
+
+    await newReview.save();
+
+    res.status(201).send({ message: 'Review added successfully', data: newReview });
+  } catch (error) {
+    res.status(500).send({ message: 'Something went wrong', error: error.message });
+  }
+}];
+
+// Fetch reviews for a product
+exports.getReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const reviews = await Review.find({ productId }).populate('userId', 'name');
+
+    res.status(200).send({ data: reviews });
+  } catch (error) {
+    res.status(500).send({ message: 'Something went wrong', error: error.message });
+  }
 };

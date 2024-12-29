@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCog, faSignOutAlt, faBox } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCog, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
-function ProfileDropdown() {
+function ProfileDropdownAdmin() {
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState('');
   const navigate = useNavigate();
@@ -12,35 +12,35 @@ function ProfileDropdown() {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserData = async () => {
       const token = localStorage.getItem('authToken');
       const userId = localStorage.getItem('userId');
       if (!token) {
         console.error('No token found');
         return;
       }
-
       try {
+        // Fetch user details
         const response = await axios.get(`http://localhost:7000/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const userData = response.data.data[0];
-        const { name } = userData;
-        setUserName(name);
+        setUserName(userData.name);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchUserName();
+    fetchUserData();
   }, []);
 
   const logout = () => {
     localStorage.removeItem('authToken');
     navigate('/');
   };
+
 
   return (
     <div className="relative inline-block text-left">
@@ -49,7 +49,7 @@ function ProfileDropdown() {
       </div>
 
       {isOpen && (
-        <div className="absolute -right-32 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+        <div className="absolute -right-32 mt-2 w-56 bg-white border rounded-md shadow-lg z-50">
           <div className="px-4 py-2 text-gray-800">
             {userName ? `Hi, ${userName}!` : 'Hi, User!'}
           </div>
@@ -60,10 +60,6 @@ function ProfileDropdown() {
           <Link to="/settings" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
             <FontAwesomeIcon icon={faCog} className="mr-2" />
             Settings
-          </Link>
-          <Link to="/orders" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <FontAwesomeIcon icon={faBox} className="mr-2" />
-            My Orders
           </Link>
           <a
             href="#"
@@ -79,4 +75,4 @@ function ProfileDropdown() {
   );
 }
 
-export default ProfileDropdown;
+export default ProfileDropdownAdmin;

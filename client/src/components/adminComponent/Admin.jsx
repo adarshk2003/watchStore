@@ -1,8 +1,10 @@
-function AdminHome(){
-    return(
-    <>
-    <h1>admin here</h1>
-    </>
-)
-}
-export default AdminHome;
+// import NavAdmin from "./AdminNav";
+// function AdminHome(){
+//     return(
+//     <>
+//         <NavAdmin/>
+        
+//     </>
+// )
+// }
+// export default AdminHome;

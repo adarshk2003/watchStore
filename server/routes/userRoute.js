@@ -17,6 +17,7 @@ router.get('/user/:id', userController.getSingleUser);
 router.delete('/user/:id', userController.deleteUser);
 router.get('/userprofile', userController.viewUserProfile);
 router.put('/updateUser',userController.updateUser)
-
+router.post('/block', setAccessControl('1'), userController.blockUser);
+router.post('/unblock', setAccessControl('1'), userController.unblockUser);
 
 module.exports = router;

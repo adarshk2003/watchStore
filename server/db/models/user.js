@@ -21,11 +21,15 @@ const user = new mongoose.Schema({
     },
     image:{
         type:String,
-        required:false
+        required:false,
     },
     user_type: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user_types"
+    },
+    isBlocked:{
+        type: Boolean,
+        default: false,
     },
 },{ timestamps: true });
 module.exports = mongoose.model("users", user);

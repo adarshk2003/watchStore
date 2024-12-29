@@ -57,15 +57,19 @@ const product = new mongoose.Schema({
     },
     crystal: {
         type: String,
-        required: false,  
+        required: false,
     },
     product_images: {
-        type: [String],  
+        type: [String],
     },
     seller: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
         required: true,
+    },
+    isStatus: {
+        type: Boolean,
+        default: 'false'
     },
 }, { timestamps: true });
 

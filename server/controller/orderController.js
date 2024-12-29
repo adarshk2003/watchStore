@@ -1,8 +1,7 @@
-const order=require('../db/models/orders');
-const jwt=require('jsonwebtoken');
-const Product=require('../db/models/product')
-const success_function = require('../utils/response-handler').success_function;
-const error_function = require('../utils/response-handler').error_function;
+const order = require('../db/models/orders');
+const jwt = require('jsonwebtoken');
+const Product = require('../db/models/product');
+const { success_function, error_function } = require('../utils/response-handler');
 
 const authenticate = (req, res, next) => {
     const authorizationHeader = req.header('Authorization');
@@ -27,8 +26,6 @@ const authenticate = (req, res, next) => {
     }
 };
 
-
-
 exports.createOrder = [
     authenticate, // Middleware to authenticate the user
     async (req, res) => {
@@ -39,15 +36,21 @@ exports.createOrder = [
             // Extract order details from the request body
             const { products, address, total, paymentMethod } = req.body;
 
-            // Validate products
+            // Validate order details
             if (!products || !Array.isArray(products) || products.length === 0) {
                 return res.status(400).json({ message: 'Products are required and must be an array.' });
             }
-
-            // Validate total
-            if (!total || total <= 0) {
+            if (!address) {
+                return res.status(400).json({ message: 'Address is required.' });
+            }
+            if (total == null || total <= 0) {
                 return res.status(400).json({ message: 'Invalid total amount.' });
             }
+            if (!paymentMethod) {
+                return res.status(400).json({ message: 'Payment method is required.' });
+            }
+
+            console.log("Order Details:", { userId, products, address, total, paymentMethod });
 
             // Validate stock availability and seller check for each product
             for (const item of products) {
@@ -57,17 +60,19 @@ exports.createOrder = [
                     return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
                 }
 
+                console.log(`Product seller for product ${item.productId}: ${product.seller}`);
+
                 // Check if the logged-in user is the seller of the product
-                if (product.userId.toString() === userId) {
+                if (product.seller.toString() === userId) {
                     return res.status(400).json({
-                        message: `You cannot purchase your own product: ${product.name}.`,
+                        message: `You cannot purchase your own product: ${product.title}.`,
                     });
                 }
 
                 // Check stock availability
                 if (product.stock < item.quantity) {
                     return res.status(400).json({
-                        message: `Not enough stock for product: ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
+                        message: `Not enough stock for product: ${product.title}. Available: ${product.stock}, Requested: ${item.quantity}`,
                     });
                 }
             }
@@ -104,6 +109,7 @@ exports.createOrder = [
 ];
 
 
+
 exports.viewUserOrders = [
     authenticate, // Middleware to authenticate the user
     async (req, res) => {
@@ -130,37 +136,30 @@ exports.viewUserOrders = [
     },
 ];
 
-exports.viewAllOrders=async function (req,res) {
-    try{
-        
-
-        let orderData=await order.find()
-        .populate("userId", "name email phone") 
-      .populate("products.productId");;
+exports.viewAllOrders = async function (req, res) {
+    try {
+        let orderData = await order.find()
+            .populate("userId", "name email phone")
+            .populate("products.productId");
         console.log(orderData);
-
 
         let response = success_function({
             statusCode: 200,
             data: orderData,
-            message: "orders fetched successfully",
+            message: "Orders fetched successfully",
         });
 
         res.status(response.statusCode).send(response);
         return;
-    }
-    catch(error){
+    } catch (error) {
         console.log("error : ", error);
 
         let response = error_function({
             statusCode: 400,
             message: error.message ? error.message : "Something went wrong",
-        })
+        });
 
         res.status(response.statusCode).send(response);
         return;
     }
-    
 }
-
-

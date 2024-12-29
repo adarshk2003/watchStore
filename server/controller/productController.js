@@ -138,10 +138,14 @@ exports.viewSingleProduct = async function (req, res) {
     try {
         let id = req.params.id;
         console.log("id : ", id);
-
+        if (!id) {
+            return res.status(400).send('Product ID is required.');
+        }
         let productData = await products.findOne({ _id: id });
         console.log("productdata : ", productData);
-
+        if (!productData) {
+            return res.status(404).send('Product not found.');
+        }
         res.status(200).send(productData);
         return;
     } catch (error) {
@@ -154,6 +158,7 @@ exports.viewSingleProduct = async function (req, res) {
 exports.viewProductsByUser = [authenticate, async (req, res) => {
     try {
         const userId = req.user.id;
+
 
         const userProducts = await products.find({ userId });
 
@@ -203,16 +208,16 @@ exports.viewProductsByCategory = async (req, res) => {
 //view products uploaded by user for admin
 exports.getProductsByUser = async (req, res) => {
     const { userId } = req.params; // Extract userId from the request parameters
+    console.log('User ID received:', userId); // Log the userId to ensure it's correct
 
     try {
         // Ensure userId is converted to ObjectId
-        const product = await products.find({ userId: new mongoose.Types.ObjectId(userId) });
+        const productsList = await products.find({ seller: new mongoose.Types.ObjectId(userId) });
 
-        // Debug log to check fetched products
-        console.log('Products fetched:', product);
+        console.log('Fetched products list:', productsList);  // Log the fetched products
 
         // Check if products exist for the given user
-        if (!product.length) {
+        if (!productsList || productsList.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'No products found for this user.',
@@ -222,7 +227,7 @@ exports.getProductsByUser = async (req, res) => {
         // Return the products
         return res.status(200).json({
             success: true,
-            data: product,
+            data: productsList,
         });
     } catch (error) {
         // Debug error
@@ -235,3 +240,97 @@ exports.getProductsByUser = async (req, res) => {
         });
     }
 };
+
+
+
+
+// Controller to block a product
+exports.blockProduct = [authenticate, async function (req, res) {
+    const { productId } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ message: 'Invalid product ID format.' });
+    }
+    try {
+        const product = await products.findByIdAndUpdate(productId, { isStatus: true }, { new: true });
+        if (!product) {
+            return res.status(404).json({ message: 'product not found.' });
+        }
+        res.status(200).json({ message: 'product blocked successfully.', product });
+        console.log("product blocked successfully", product);
+    } catch (error) {
+        console.error('Error blocking product:', error);
+        res.status(500).json({ message: 'Error blocking product.', error: error.message });
+    }
+
+}];
+
+//Controller to unblock a product
+
+exports.unblockProduct = [authenticate, async function (req, res) {
+    const { productId } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ message: 'Invalid product ID format.' });
+    }
+    try {
+        const product = await products.findByIdAndUpdate(productId, { isStatus: false }, { new: true });
+        if (!product) {
+            // User not found
+            return res.status(404).json({ message: 'product not found.' });
+        }
+        res.status(200).json({ message: 'product  unblocked successfully.', product });
+        console.log("product unblocked successfully", product);
+
+    } catch (error) {
+        console.error('Error unblocking product:', error);
+        res.status(500).json({ message: 'Error unblocking product.', error: error.message });
+
+    }
+}];
+
+//update product
+exports.updateProduct = [
+    authenticate,
+    async (req, res) => {
+        try {
+            console.log("Request Params:", req.params); // Log all route params
+            console.log("Request Body:", req.body); // Log body for debugging
+
+            const { productId } = req.params;
+
+            // Check if productId is missing
+            if (!productId) {
+                return res.status(400).json({ message: "Product ID is missing from the URL." });
+            }
+
+            // Validate productId format
+            if (!mongoose.Types.ObjectId.isValid(productId)) {
+                return res.status(400).json({ message: "Invalid Product ID format." });
+            }
+
+            // Proceed with finding and updating the product
+            const updateData = req.body;
+            const userId = req.user.id;
+
+            // Check if the product belongs to the user
+            const product = await products.findOne({ _id: productId, userId });
+            if (!product) {
+                return res.status(404).json({ message: "Product not found or unauthorized." });
+            }
+
+            // Update the product
+            const updatedProduct = await products.findByIdAndUpdate(productId, updateData, {
+                new: true,
+                runValidators: true,
+            });
+
+            // Return updated product data in the response
+            return res.status(200).json({
+                message: "Product updated successfully.",
+                data: updatedProduct,
+            });
+        } catch (error) {
+            console.error("Error updating product:", error);
+            return res.status(500).json({ message: "An error occurred.", error: error.message });
+        }
+    },
+];

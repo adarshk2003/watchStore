@@ -14,7 +14,7 @@ function Footer() {
                     <div className="w-full md:w-1/4 px-4 mb-4">
                         <h4 className="text-lg font-bold mb-2 font-mono">Shop</h4>
                         <ul>
-                            <li><a href="#" className="text-gray-300 hover:text-white   ">New Arrivals</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white">New Arrivals</a></li>
                             <li><a href="#" className="text-gray-300 hover:text-white">Best Sellers</a></li>
                             <li><a href="#" className="text-gray-300 hover:text-white">Sale</a></li>
                             <li><a href="#" className="text-gray-300 hover:text-white">Gift Cards</a></li>
@@ -25,8 +25,8 @@ function Footer() {
                         <ul>
                             <li><a href="#" className="text-gray-300 hover:text-white">Men</a></li>
                             <li><a href="#" className="text-gray-300 hover:text-white">Women</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Kids</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Clyro MAX</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white">brands</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white">Collections</a></li>
                         </ul>
                     </div>
                     <div className="w-full md:w-1/4 px-4 mb-4">

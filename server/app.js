@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const cors = require('cors');
-const dotenv=require('dotenv')
-dotenv.config()
+const dotenv=require('dotenv');
+dotenv.config();
 const mongoConnect=require('./db/connect')
 const userRoute=require('./routes/userRoute');
 const ProductRoute=require('./routes/ProductRoute');
@@ -12,7 +12,6 @@ const cartRoute=require('./routes/cartRouter');
 const wishlistRout=require('./routes/wishlistRoute');
 const reviewsRoute=require('./routes/reviewRoute');
 const orderRoute=require('./routes/orderRoute');
-
 
 // Middleware to handle CORS
 app.use(cors({

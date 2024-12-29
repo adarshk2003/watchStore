@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function ProfileDropdownseller() {
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState('');
-
+const navigate=useNavigate()
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   useEffect(() => {
@@ -60,6 +60,7 @@ function ProfileDropdownseller() {
             onClick={() => {
               localStorage.removeItem('authToken');
               localStorage.removeItem('userId');
+              navigate('/login')
             }}
           >
             <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />

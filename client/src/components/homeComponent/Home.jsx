@@ -1,20 +1,20 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import NavBar from "../navComponent/Nav";
 import Carousel from "../GraphicComponent/Carosile";
 import Footer from "./Footer";
 import ProductGrid from "./ProductGrid";
 
 function Home() {
-
+    const [searchQuery, setSearchQuery] = useState('');
     return (
         <>
             {/* Pass scroll function as a prop to NavBar */}
-            <NavBar/>
+            <NavBar onSearch={setSearchQuery}/>
             <Carousel />
             <div className="h-40 w-full"></div>
             
             <div>
-                <ProductGrid />
+                <ProductGrid  searchQuery={searchQuery} />
             </div>
             <div className="h-40 w-full"></div>
             <Footer />
