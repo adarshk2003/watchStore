@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import NavBaruser from "../navComponent/userNav";
 
 const baseUrl = 'http://localhost:7000';
 
@@ -67,7 +68,8 @@ const OrderDetailPage = () => {
     );
   }, 0);
 
-  return (
+  return (<>
+  <NavBaruser/>
     <div className="container mx-auto p-4">
       {/* Total Price Section */}
       <div className="bg-gray-100 p-4 rounded-lg mb-6 shadow-md">
@@ -172,7 +174,7 @@ const OrderDetailPage = () => {
         <p>No orders found.</p>
       )}
     </div>
-  );
+    </> );
 };
 
 export default OrderDetailPage;

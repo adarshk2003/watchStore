@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import NavBaruser from "../navComponent/userNav";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -144,18 +145,8 @@ export default function Cart() {
   }
 
   return (<>
-    <div>
-    <button
-        onClick={() => navigate(-1)}
-        className="mb-2 px-4 py-2 bg-transparent hover:bg-gray-400/20 rounded text-black font-semibold"
-      >
-        Back
-      </button>
-    </div>
+  <NavBaruser/>
     <div className="container-fluid h-screen bg-white mx-auto p-4 flex flex-col lg:flex-row lg:justify-between">
-      {/* Back Button */}
-    
-
       <div className="w-full lg:w-2/3">
         <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
         {cartItems.length === 0 ? (
@@ -240,7 +231,7 @@ export default function Cart() {
       </div>
 
       {cartItems.length > 0 && (
-        <div className="w-full lg:w-1/3 h-fit bg-slate-50 shadow rounded-lg p-5 border border-gray-200 mt-8 lg:mt-0">
+        <div className="w-full lg:w-1/3 h-full bg-slate-50 shadow rounded-lg p-5 border border-gray-200 mt-8 lg:mt-0">
           <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
           <div className="text-gray-700 text-lg">
             <p>

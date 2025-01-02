@@ -1,4 +1,4 @@
-exports.blockUserTemplate = function (name, email,reason, supportUrl) {
+exports.unblockUserTemplate = function (name, email, supportUrl) {
     return new Promise(async (resolve, reject) => {
         try {
             let template = `
@@ -22,7 +22,7 @@ exports.blockUserTemplate = function (name, email,reason, supportUrl) {
                         }
                         .header {
                             text-align: center;
-                            background-color: #dc3545;
+                            background-color: #28a745;
                             color: #ffffff;
                             padding: 10px 0;
                             border-radius: 8px 8px 0 0;
@@ -41,13 +41,13 @@ exports.blockUserTemplate = function (name, email,reason, supportUrl) {
                             display: inline-block;
                             padding: 10px 20px;
                             color: #ffffff;
-                            background-color: #dc3545;
+                            background-color: #28a745;
                             text-decoration: none;
                             border-radius: 4px;
                             font-size: 16px;
                         }
                         .button:hover {
-                            background-color: #a71d2a;
+                            background-color: #1e7e34;
                         }
                         .footer {
                             text-align: center;
@@ -61,18 +61,18 @@ exports.blockUserTemplate = function (name, email,reason, supportUrl) {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h2>Account Blocked</h2>
+                            <h2>Your Account Has Been Unblocked</h2>
                         </div>
                         <div class="content">
-                        <strong>${email}</strong>
+                            <strong>${email}</strong>
                             <p>Dear <strong>${name}</strong>,</p>
-                            <p>We regret to inform you that your account has been temporarily blocked due to a violation of our terms and conditions.</p>
-                            <p><strong>Reason for Blocking: </strong>${reason}</p>
-                            <p>If you believe this is a mistake or need further assistance, please contact our support team using the link below:</p>
+                            <p>We are pleased to inform you that your account has been successfully unblocked. We sincerely apologize for any inconvenience caused by the temporary suspension of your account.</p>
+                            <p>We understand how frustrating it can be, and we assure you that we are working hard to prevent such issues in the future. Your account is now fully accessible, and we appreciate your patience and understanding throughout this process.</p>
+                            <p>If you have any further concerns or questions, please don't hesitate to reach out to our support team using the link below:</p>
                             <p style="text-align: center;">
                                 <a href="${supportUrl}" class="button">Contact Support</a>
                             </p>
-                            <p>We appreciate your understanding and cooperation.</p>
+                            <p>Thank you once again for your patience. We truly appreciate your continued trust in us.</p>
                             <p>Best regards,</p>
                             <p>The Support Team</p>
                         </div>

@@ -101,7 +101,7 @@ const Profile = () => {
     }
   };
 
-  return (
+  return (<>
     <div className="max-w-md mx-auto p-6 text-black shadow-lg rounded-lg mt-10 text-center">
       <h1 className="text-3xl font-semibold mb-6">
         {editMode ? 'Edit Profile' : 'Your Profile'}
@@ -187,7 +187,7 @@ const Profile = () => {
         </button>
       )}
     </div>
-  );
+    </>);
 };
 
 export default Profile;

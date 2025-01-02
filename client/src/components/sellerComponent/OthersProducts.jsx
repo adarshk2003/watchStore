@@ -30,6 +30,8 @@ export default function OthersProductList() {
         });
 
         const allProducts = response.data.data;
+        const visibleProducts = allProducts.filter(product => !product.isStatus);
+        const sortedProducts = visibleProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         // Filter products that are not added by the current user (this is for when another seller is viewing)
         const productsNotAddedByUser = allProducts.filter(
@@ -39,7 +41,7 @@ export default function OthersProductList() {
             (product.createdBy && product.createdBy._id !== userId)
         );
 
-        setProducts(allProducts);
+        setProducts(sortedProducts);
         setFilteredProducts(productsNotAddedByUser);
         setLoading(false);
       } catch (err) {

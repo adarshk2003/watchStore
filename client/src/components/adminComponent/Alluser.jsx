@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import NavAdmin from "./AdminNav";
 import axios from "axios";
 import { FaEye, FaTrash, FaSpinner, FaBan, FaUnlockAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import NavAdminCommon from "./NavAdminCommon";
 
 const Allusers = () => {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ const Allusers = () => {
 
   return (
     <>
-      <NavAdmin />
+      <NavAdminCommon />
       <div className="p-6 bg-gray-100 min-h-screen">
         <h2 className="text-3xl font-bold mb-6 text-center">Users</h2>
 

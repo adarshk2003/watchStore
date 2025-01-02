@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import NavAdmin from './AdminNav';
+import NavAdminCommon from './NavAdminCommon';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
@@ -12,7 +12,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { FaUsers, FaBox, FaChartLine } from 'react-icons/fa';
-
 const DashboardAdmin = () => {
   const [selectedFilter, setSelectedFilter] = useState('monthly');
   const [sales, setSales] = useState([]);
@@ -169,7 +168,7 @@ const DashboardAdmin = () => {
   if (!dateFns) return <div>Loading...</div>;
 
   return (<>
-    <NavAdmin/>
+    <NavAdminCommon/>
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-gray-700">Admin Dashboard</h1>
 

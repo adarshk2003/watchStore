@@ -37,7 +37,6 @@ function App() {
           <Route path='/signup' element={<LoadingWrapper> <SignUp /> </LoadingWrapper>} />
           <Route path='/addproduct' element={<LoadingWrapper> <AddProduct /> </LoadingWrapper>} />
           <Route path='/seller-signup' element={<LoadingWrapper><SellerSignUpForm /></LoadingWrapper>} />
-          {/* <Route path='/admin-home' element={<LoadingWrapper><AdminHome /></LoadingWrapper>} /> */}
           <Route path='/product/:id' element={<LoadingWrapper><ProductPage /></LoadingWrapper>} />
           <Route path='/seller-home' element={<LoadingWrapper><Seller /></LoadingWrapper>} />
           <Route path='/profile'element={<LoadingWrapper><Profile/></LoadingWrapper>}/>

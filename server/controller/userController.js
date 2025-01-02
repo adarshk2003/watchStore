@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const success_function = require('../utils/response-handler').success_function;
 const error_function = require('../utils/response-handler').error_function;
 const bcrypt = require('bcryptjs');
+const { sendEmail } = require('../utils/sendemail');
+const { blockUserTemplate } = require('../utils/template/block-user');
+const{unblockUserTemplate}=require('../utils/template/unblock-user')
 
 const user_type=require('../db/models/user_type')
 const fileUpload = require('../utils/fileUpload').fileUpload;
@@ -337,7 +340,8 @@ exports.updateUser = [authenticate, async function (req, res) {
 exports.blockUser = [
     authenticate, // Middleware for authentication
     async function (req, res) {
-      const { userId } = req.body; // Extracting userId from the request body
+        const { userId } = req.body;
+        const { reason } = req.body;
   
       // Validate userId format
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -350,6 +354,21 @@ exports.blockUser = [
           // User not found
           return res.status(404).json({ message: 'User not found.' });
         }
+          const emailContent = await blockUserTemplate(
+              user.name,
+              user.email,
+              reason,
+              'support.clyro@gmail.com',
+            
+          )
+          const Emailsent = await sendEmail(
+              user.email,
+              "user blocked notification",
+              emailContent,
+          )
+          if (!Emailsent) {
+              res.status(400).send({ message: "failed to send email " })
+          }
         // Successful response
         res.status(200).json({ message: 'User blocked successfully.', user });
         console.log("user blocked successfully",user);
@@ -364,7 +383,8 @@ exports.blockUser = [
   exports.unblockUser = [
     authenticate, // Middleware for authentication
     async function (req, res) {
-      const { userId } = req.body;
+        const { userId } = req.body;
+        const { reason } = req.body;
   
       // Validate userId format
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -378,6 +398,21 @@ exports.blockUser = [
           // User not found
           return res.status(404).json({ message: 'User not found.' });
         }
+          const emailContent = await unblockUserTemplate(
+              user.name,
+              user.email,
+              reason,
+              'support.clyro@gmail.com',
+
+          )
+          const emailSend = await sendEmail(
+              user.email,
+              "user unblocked notification",
+              emailContent,
+          )
+          if (!emailSend) {
+              res.status(400).send({message:"failed to send email "})
+          }
         // Successful response
         res.status(200).json({ message: 'User unblocked successfully.', user });
       } catch (error) {

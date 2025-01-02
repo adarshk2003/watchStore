@@ -136,7 +136,9 @@ function ProductGrid() {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesPriceRange = selectedPriceRange === '' || (
+      const matchesPriceRange = selectedPriceRange === '' ||(
+        selectedPriceRange === '100-1000' && product.price >= 100 && product.price <= 1000
+      )|| (
         selectedPriceRange === '1000-10000' && product.price >= 1000 && product.price <= 10000
       ) || (
         selectedPriceRange === '10000-above' && product.price > 10000
@@ -166,16 +168,17 @@ function ProductGrid() {
         <select
           value={selectedPriceRange}
           onChange={(e) => setSelectedPriceRange(e.target.value)}
-          className="border p-2"
+          className="border p-2 rounded-md outline-none"
         >
           <option value="">Filter by Price</option>
+          <option value="100-1000">€100 - €1000</option>
           <option value="1000-10000">€1000 - €10000</option>
           <option value="10000-above">€10000 and above</option>
         </select>
         <select
           value={selectedBrand}
           onChange={(e) => setSelectedBrand(e.target.value)}
-          className="border p-2"
+          className="border p-2 rounded-md outline-none "
         >
           <option value="">Filter by Brand</option>
           {brands.map((brand) => (
@@ -187,7 +190,7 @@ function ProductGrid() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border p-2"
+          className="border p-2 rounded-md outline-none"
         >
           <option value="">Filter by Category</option>
           {categories.map((category) => (
