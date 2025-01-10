@@ -57,10 +57,6 @@ function ProfileDropdownAdmin() {
             <FontAwesomeIcon icon={faUser} className="mr-2" />
             Profile
           </Link>
-          <Link to="/settings" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <FontAwesomeIcon icon={faCog} className="mr-2" />
-            Settings
-          </Link>
           <a
             href="#"
             className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100"

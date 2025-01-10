@@ -7,15 +7,14 @@ import { addToWishlist, removeFromWishlist } from './wishlistUtil';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function ProductGrid() {
+function ProductGrid({ selectedProducts }) {
   const productSectionRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
-  const navigate = useNavigate();  // To navigate to the login page
+  const navigate = useNavigate();
 
   // Filter states
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
@@ -23,6 +22,10 @@ function ProductGrid() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12; // Display 12 products per page
 
   const baseUrl = "http://localhost:7000";
   const token = localStorage.getItem("authToken");
@@ -101,7 +104,7 @@ function ProductGrid() {
 
   const handleAddToCart = async (productId) => {
     if (!token) {
-      navigate("/login"); // Redirect to login page if not logged in
+      navigate("/login");
       return;
     }
 
@@ -119,7 +122,7 @@ function ProductGrid() {
 
   const handleAddToWishlist = async (productId) => {
     if (!token) {
-      navigate("/login"); // Redirect to login page if not logged in
+      navigate("/login");
       return;
     }
 
@@ -130,12 +133,9 @@ function ProductGrid() {
     }
   };
 
+  // Filter logic
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesSearchQuery =
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase());
-
       const matchesPriceRange = selectedPriceRange === '' ||(
         selectedPriceRange === '100-1000' && product.price >= 100 && product.price <= 1000
       )|| (
@@ -148,27 +148,43 @@ function ProductGrid() {
 
       const matchesCategory = selectedCategory === '' || product.category.toLowerCase().includes(selectedCategory.toLowerCase());
 
-      return matchesSearchQuery && matchesPriceRange && matchesBrand && matchesCategory;
+      return matchesPriceRange && matchesBrand && matchesCategory;
     });
-  }, [products, searchQuery, selectedPriceRange, selectedBrand, selectedCategory]);
+  }, [products, selectedPriceRange, selectedBrand, selectedCategory]);
+
+  // Get New Arrivals - Products created in the last 7 days
+  const getNewArrivals = useMemo(() => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7); // 7 days ago
+    return products.filter((product) => new Date(product.createdAt) >= oneWeekAgo);
+  }, [products]);
+
+  // Combine selected products with filtered products for display
+  const finalProductsToDisplay = useMemo(() => {
+    return [...selectedProducts, ...filteredProducts];
+  }, [selectedProducts, filteredProducts]);
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = finalProductsToDisplay.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const totalPages = Math.ceil(finalProductsToDisplay.length / productsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   if (loading) return <div className="loader">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div>
-      <div className="filters flex gap-4 p-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border p-2"
-        />
+      <div className="filters flex flex-wrap gap-4 p-4">
         <select
           value={selectedPriceRange}
           onChange={(e) => setSelectedPriceRange(e.target.value)}
-          className="border p-2 rounded-md outline-none"
+          className="border p-2 rounded-md outline-none w-full sm:w-auto"
         >
           <option value="">Filter by Price</option>
           <option value="100-1000">€100 - €1000</option>
@@ -178,7 +194,7 @@ function ProductGrid() {
         <select
           value={selectedBrand}
           onChange={(e) => setSelectedBrand(e.target.value)}
-          className="border p-2 rounded-md outline-none "
+          className="border p-2 rounded-md outline-none w-full sm:w-auto"
         >
           <option value="">Filter by Brand</option>
           {brands.map((brand) => (
@@ -190,7 +206,7 @@ function ProductGrid() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border p-2 rounded-md outline-none"
+          className="border p-2 rounded-md outline-none w-full sm:w-auto"
         >
           <option value="">Filter by Category</option>
           {categories.map((category) => (
@@ -201,11 +217,95 @@ function ProductGrid() {
         </select>
       </div>
 
+      {/* New Arrivals Section */}
+      {getNewArrivals.length > 0 && (
+        <div className="new-arrivals p-4 bg-gray-100">
+          <h2 className="text-xl font-semibold">New Arrivals</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            {getNewArrivals.map((product) => {
+              const isInCart = cartItems.includes(product._id);
+              const isInWishlist = wishlistItems.includes(product._id);
+
+              const imageUrl = product.product_images && product.product_images.length > 0
+                ? `${baseUrl}/${product.product_images[0]}`
+                : "/public/rolex.jpg"; // Fallback image
+
+              return (
+                <div
+                  key={product._id}
+                  className="max-w-xs w-full bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl"
+                  onClick={() => handleProductCardClick(product._id)}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={product.title}
+                    className="h-60 w-full object-cover rounded-t-xl"
+                  />
+                  <div className="px-4 py-3">
+                    <span className="text-gray-400 mr-3 uppercase text-xs">
+                      {product.brand || "Unknown Brand"}
+                    </span>
+                    <p className="text-lg font-bold text-black truncate block capitalize">
+                      {product.title}
+                    </p>
+                    <div className="flex items-center">
+                      <p className="text-lg font-semibold text-black cursor-auto my-3">
+                        €{product.price || "N/A"}
+                      </p>
+                    </div>
+                    <p
+                      className={`text-sm font-semibold my-2 ${product.stock > 0
+                        ? "text-green-500"
+                        : "text-red-500"
+                        }`}
+                    >
+                      {product.stock > 0
+                        ? `${product.stock} in stock`
+                        : "Out of Stock"}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      {product.stock > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(product._id);
+                          }}
+                          className={`px-4 py-2 rounded-md ${isInCart
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-emerald-900 hover:bg-emerald-700 text-white"
+                            }`}
+                          disabled={isInCart}
+                        >
+                          {isInCart ? "In Cart" : "Add to Cart"}
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToWishlist(product._id);
+                        }}
+                        className={`p-2 rounded-full w-9 h-9 ${isInWishlist ? 'bg-red-600' : 'bg-black'}`}
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-lg ${isInWishlist ? 'text-white' : 'text-white'}`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Display products */}
       <div
         ref={productSectionRef}
-        className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-10"
+        className="grid grid-cols-1 md:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-10"
       >
-        {filteredProducts.map((product) => {
+        {currentProducts.map((product) => {
           const isInCart = cartItems.includes(product._id);
           const isInWishlist = wishlistItems.includes(product._id);
 
@@ -279,6 +379,19 @@ function ProductGrid() {
             </div>
           );
         })}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="pagination flex justify-center gap-4 py-4">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            className={`px-4 py-2 rounded-md ${index + 1 === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
     </div>
   );

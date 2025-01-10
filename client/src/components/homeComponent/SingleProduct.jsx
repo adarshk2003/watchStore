@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { addToCart } from './cartUtil';
 import { FaShoppingCart, FaHeart, FaRegHeart, FaBolt } from 'react-icons/fa';
+import NavBar from './Nav';
 
 const baseUrl = 'http://localhost:7000';
 
@@ -96,6 +97,8 @@ function SingleProduct() {
   if (error) return <p>{error}</p>;
 
   return (
+  <>
+  <NavBar/>
     <div className="flex flex-col gap-8 p-6">
       {/* Product Images and Features */}
       <div className="flex flex-col lg:flex-row gap-8">
@@ -126,20 +129,6 @@ function SingleProduct() {
           <p>{product.description}</p>
           <h3 className="text-2xl font-semibold text-green-700">€{product.price}</h3>
 
-          {/* Product Features */}
-          <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Product Features</h3>
-            <ul className="list-disc list-inside text-gray-700 space-y-2">
-              <li><strong>Model:</strong> {product.model}</li>
-              <li><strong>Case Material:</strong> {product.caseMaterial}</li>
-              <li><strong>Dial:</strong> {product.dial}</li>
-              <li><strong>Bracelet:</strong> {product.bracelet}</li>
-              <li><strong>Movement:</strong> {product.movement}</li>
-              <li><strong>Power Reserve:</strong> {product.power} hours</li>
-              <li><strong>Water Resistance:</strong> {product.waterResestence} meters</li>
-              {product.crystal && <li><strong>Crystal:</strong> {product.crystal}</li>}
-            </ul>
-          </div>
 
           {/* Buttons */}
           <div className="flex gap-4">
@@ -167,6 +156,21 @@ function SingleProduct() {
           </div>
         </div>
       </div>
+              <div className='w-full border-b'></div>
+      {/* Product Features */}
+      <div className=" p-4 ">
+        <h3 className="text-xl font-semibold mb-2">Product Features</h3>
+        <ul className="list-disc list-inside text-gray-700 space-y-2">
+          <li ><strong>Model:</strong> {product.model}</li>
+          <li><strong>Case Material:</strong> {product.caseMaterial}</li>
+          <li><strong>Dial:</strong> {product.dial}</li>
+          <li><strong>Bracelet:</strong> {product.bracelet}</li>
+          <li><strong>Movement:</strong> {product.movement}</li>
+          <li><strong>Power Reserve:</strong> {product.power} hours</li>
+          <li><strong>Water Resistance:</strong> {product.waterResestence} meters</li>
+          {product.crystal && <li><strong>Crystal:</strong> {product.crystal}</li>}
+        </ul>
+      </div>
 
       {/* Similar Products */}
       <div>
@@ -181,7 +185,7 @@ function SingleProduct() {
               <img
                 src={`${baseUrl}/${product.product_images[0]}`}
                 alt={product.title}
-                className="w-32 h-32 object-cover"
+                className="w-full h-32 object-cover object-center"
               />
               <h3>{product.title}</h3>
               <p>€{product.price}</p>
@@ -190,7 +194,7 @@ function SingleProduct() {
         </div>
       </div>
     </div>
-  );
+  </>);
 }
 
 export default SingleProduct;

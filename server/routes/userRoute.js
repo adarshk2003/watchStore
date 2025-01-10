@@ -19,5 +19,8 @@ router.get('/userprofile', userController.viewUserProfile);
 router.put('/updateUser',userController.updateUser)
 router.post('/block', setAccessControl('1'), userController.blockUser);
 router.post('/unblock', setAccessControl('1'), userController.unblockUser);
+router.post('/requestUpgrade',setAccessControl('2'), userController.requestUpgrade);
+router.put('/approveUpgrade/:id',setAccessControl('1'), userController.approveUpgrade);
+router.get('/upgradeRequests',setAccessControl('1'),  userController.getAllUpgradeRequests)
 
 module.exports = router;

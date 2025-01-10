@@ -13,6 +13,7 @@ const wishlistRout=require('./routes/wishlistRoute');
 const reviewsRoute=require('./routes/reviewRoute');
 const orderRoute=require('./routes/orderRoute');
 
+
 // Middleware to handle CORS
 app.use(cors({
     origin: "http://localhost:5173"

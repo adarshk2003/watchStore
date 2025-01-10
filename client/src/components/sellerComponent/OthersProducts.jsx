@@ -113,7 +113,7 @@ export default function OthersProductList() {
               }
               alt={product.title}
               className="w-full h-40 object-cover hover:cursor-pointer"
-              onClick={() => navigate(`/product/${product._id}`)}
+              onClick={() => navigate(`/products/${product._id}`)}
             />
             <div className="p-4">
               <h4 className="text-lg font-bold capitalize">{product.title}</h4>

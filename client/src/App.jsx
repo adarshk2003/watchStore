@@ -12,7 +12,6 @@ import ProductPage from './components/homeComponent/SingleProduct';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import Seller from './components/sellerComponent/Seller';
-import SellerSignUpForm from './components/ValidationComponent/SellerSignupform';
 import LoadingWrapper from './components/GraphicComponent/loadingWrapper';
 import Wishlist from './components/homeComponent/wishlist';
 import Collections from './components/homeComponent/collections';
@@ -25,6 +24,7 @@ import Checkout from './components/homeComponent/orderdetails';
 import OrderDetailPage from './components/homeComponent/myOrders';
 import DashboardAdmin from './components/adminComponent/Dashbord';
 import DashboardSeller from './components/sellerComponent/exploreDetails';
+import SingleProductSeller from './components/sellerComponent/singleProductSeller';
 library.add(fas);
 
 function App() {
@@ -36,8 +36,9 @@ function App() {
           <Route path="/home" element={<LoadingWrapper> <Home /> </LoadingWrapper>} />
           <Route path='/signup' element={<LoadingWrapper> <SignUp /> </LoadingWrapper>} />
           <Route path='/addproduct' element={<LoadingWrapper> <AddProduct /> </LoadingWrapper>} />
-          <Route path='/seller-signup' element={<LoadingWrapper><SellerSignUpForm /></LoadingWrapper>} />
           <Route path='/product/:id' element={<LoadingWrapper><ProductPage /></LoadingWrapper>} />
+          <Route path='/products/:id' element={<LoadingWrapper><SingleProductSeller /></LoadingWrapper>} />
+
           <Route path='/seller-home' element={<LoadingWrapper><Seller /></LoadingWrapper>} />
           <Route path='/profile'element={<LoadingWrapper><Profile/></LoadingWrapper>}/>
           <Route path='/myproducts' element={<LoadingWrapper><MyProducts/></LoadingWrapper>}/>

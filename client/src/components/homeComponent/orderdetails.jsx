@@ -2,6 +2,7 @@ import { useLocation, } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import NavBaruser from "../navComponent/userNav";
 
 
 export default function Checkout() {
@@ -56,6 +57,8 @@ export default function Checkout() {
   };
 
   return (
+  <>
+  <NavBaruser/>
     <div className="flex flex-col lg:flex-row lg:justify-between items-start min-h-screen bg-white p-4 lg:p-8">
       {/* Delivery Details */}
       <div className="bg-white w-full lg:w-1/2 rounded-lg p-6 mb-8 lg:mb-0">
@@ -134,5 +137,5 @@ export default function Checkout() {
         </button>
       </div>
     </div>
-  );
+  </>);
 }

@@ -119,10 +119,10 @@ export default function MyProducts() {
                 className={`w-full h-40 object-cover ${
                   product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'
                 }`}
-                onClick={() => !product.isStatus && navigate(`/product/${product._id}`)}
+                onClick={() => !product.isStatus && navigate(`/products/${product._id}`)}
               />
               <div className="p-4">
-                <h4 className="text-lg font-bold capitalize">{truncateTitle(product.title, 25)}</h4>
+                <h4 className="text-lg font-bold capitalize line-clamp-2">{truncateTitle(product.title, 25)}</h4>
                 <p className="text-gray-900 font-semibold mt-2">€ {product.price}</p>
                 <h4 className="text-md font-semibold text-gray-700 mt-2 line-clamp-1">{product.description}</h4>
                 <p className="text-gray-500 mt-2 capitalize">{product.category}</p>

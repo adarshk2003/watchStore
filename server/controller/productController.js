@@ -3,6 +3,7 @@ const success_function = require('../utils/response-handler').success_function;
 const error_function = require('../utils/response-handler').error_function;
 const jwt = require('jsonwebtoken')
 const { fileUpload } = require('../utils/fileUpload')
+const { sendEmail } = require('../utils/sendemail');
 const mongoose = require('mongoose')
 
 

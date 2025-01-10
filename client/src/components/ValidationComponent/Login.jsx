@@ -99,7 +99,7 @@ function LoginForm() {
                 name="email"
                 id="email"
                 placeholder="Email"
-                className="w-full text-black border-b border-black outline-none focus:ring focus:ring-emerald-500 py-2 bg-transparent"
+                className="w-full text-black border-b rounded-sm border-black outline-none py-2 bg-transparent"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -113,7 +113,7 @@ function LoginForm() {
                 name="password"
                 id="password"
                 placeholder="Password"
-                className="w-full text-black border-b border-black outline-none focus:ring focus:ring-emerald-500 py-2 bg-transparent"
+                className="w-full text-black border-b rounded-sm border-black outline-none  py-2 bg-transparent"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -130,7 +130,7 @@ function LoginForm() {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-emerald-900 text-white rounded-md py-2 hover:bg-emerald-700"
+              className="w-full bg-emerald-900 text-white rounded-md py-2 hover:bg-emerald-700 hover:rounded-xl"
             >
               Login
             </button>

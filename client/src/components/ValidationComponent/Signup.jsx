@@ -8,7 +8,6 @@ function SignUp({ setUserName }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSeller, setIsSeller] = useState(false);
   const [errors, setErrors] = useState('');
   const navigate = useNavigate();
 
@@ -56,7 +55,7 @@ function SignUp({ setUserName }) {
         return;
     }
 
-    const data = { name, email, password, isSeller };
+    const data = { name, email, password };
     console.log(data);
 
     // Fetching
@@ -71,13 +70,9 @@ function SignUp({ setUserName }) {
 
       // Assuming response.data.has the necessary fields. Adjust if the structure is different.
       if (response.status === 201) {
-          toast.success(isSeller ? "Account created as seller successfully!" : "Account created successfully!");
-          
-          if (isSeller) {
-              navigate('/seller-home');
-          } else {
-              navigate('/home');
-          }
+          toast.success("Account created successfully!");
+          navigate('/home');
+      
       } else {
           toast.error(response.data.message || "Something went wrong!");
       }
@@ -141,7 +136,7 @@ function SignUp({ setUserName }) {
 
             </div>
 
-            <div className="w-full flex items-center my-4">
+            {/* <div className="w-full flex items-center my-4">
               <input
                 type="checkbox"
                 id="isSeller"
@@ -150,7 +145,7 @@ function SignUp({ setUserName }) {
                 className="mr-2"
               />
               <label htmlFor="seller" className="text-sm font-mono">Sign up as a seller</label>
-            </div>
+            </div> */}
 
             <div className="w-full flex flex-col my-5">
               <button type="submit" className="my-2 w-full bg-slate-900 text-white rounded-md p-4 font-mono text-center hover:bg-emerald-900">
