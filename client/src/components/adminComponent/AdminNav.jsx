@@ -68,7 +68,7 @@ function NavAdmin() {
         </a>
         <ul className="hidden md:flex items-center gap-10 font-semibold text-base">
           <Link to='/alluser'><li className="hover:underline hover:text-emerald-800 cursor-pointer ">users</li></Link>
-           <li className="hover:underline hover:text-emerald-800 cursor-pointer">dashboard</li>
+          <Link to='/admin-home'> <li className="hover:underline hover:text-emerald-800 cursor-pointer">dashboard</li></Link>
           <li className="hover:underline hover:text-emerald-800 cursor-pointer"><NotificationPage/></li>
         </ul>
         <div className="flex items-center justify-center">

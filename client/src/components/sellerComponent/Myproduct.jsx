@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import NavSellerCom from './NavSellerCom';
 
 export default function MyProducts() {
   const [products, setProducts] = useState([]);
@@ -68,32 +69,29 @@ export default function MyProducts() {
   const handleDeleteProduct = async (productId) => {
     try {
       debugLog(`Deleting product with ID: ${productId}`);
-      const response = await axios.delete(`${baseUrl}/products/${productId}`, {
+      const response = await axios.delete(`${baseUrl}/product/${productId}`, {
         headers: {
           Authorization: `bearer ${token}`,
         },
       });
-
+  
       debugLog('Product deleted successfully:', response.data);
       toast.success(response.data.message || 'Product deleted successfully');
-      setUserProducts(userProducts.filter((product) => product._id !== productId));
+      setUserProducts((prevProducts) => prevProducts.filter((product) => product._id !== productId));
     } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Failed to delete product';
       debugLog('Error deleting product:', err);
-      toast.error(err.response?.data?.message || 'Failed to delete product');
+      toast.error(errorMsg);
     }
   };
+  
 
   const handleContactSupport = (productId, productTitle) => {
     debugLog(`Contacting support for product ID: ${productId}, Title: ${productTitle}`);
     navigate(`/support?productId=${productId}&productTitle=${encodeURIComponent(productTitle)}`);
   };
-
-  // const handleEditProduct = (productId) => {
-  //   debugLog(`Navigating to edit page for product ID: ${productId}`);
-  //   navigate(`/products/${productId}`);
-  // };
-
-  return (
+  return (<>
+    <NavSellerCom />
     <div className="container-fluid w-full">
       <div className="container mx-auto my-8 px-4">
         <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">My Products</h3>
@@ -105,9 +103,8 @@ export default function MyProducts() {
           {Array.isArray(userProducts) && userProducts.map((product) => (
             <div
               key={product._id}
-              className={`bg-white shadow-md rounded-lg overflow-hidden transition-transform transform ${
-                product.isStatus ? '' : 'hover:scale-105'
-              }`}
+              className={`bg-white shadow-md rounded-lg overflow-hidden transition-transform transform ${product.isStatus ? '' : 'hover:scale-105'
+                }`}
             >
               <img
                 src={
@@ -116,24 +113,30 @@ export default function MyProducts() {
                     : './public/images/default-image.png'
                 }
                 alt={product.title}
-                className={`w-full h-40 object-cover ${
-                  product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'
-                }`}
+                className={`w-full h-40 object-cover ${product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'
+                  }`}
                 onClick={() => !product.isStatus && navigate(`/products/${product._id}`)}
               />
               <div className="p-4">
                 <h4 className="text-lg font-bold capitalize line-clamp-2">{truncateTitle(product.title, 25)}</h4>
-                <p className="text-gray-900 font-semibold mt-2">€ {product.price}</p>
+                <p className="text-gray-900 font-semibold mt-2">₹ {product.price}</p>
                 <h4 className="text-md font-semibold text-gray-700 mt-2 line-clamp-1">{product.description}</h4>
                 <p className="text-gray-500 mt-2 capitalize">{product.category}</p>
 
                 <div className="mt-4 space-y-2">
-                  {/* <button
-                    onClick={() => handleEditProduct(product._id)}
+                  <button
+                    onClick={() => navigate(`/edit-product/${product._id}`)}
                     className="w-full bg-yellow-500 text-white py-2 rounded-md hover:bg-yellow-600"
                   >
                     Edit Product
-                  </button> */}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product._id)}
+                    className="w-full bg-red-500 text-white py-2 rounded-md hover:bg-yellow-600"
+                  >
+                    Delete product
+                  </button>
+
 
                   {product.isStatus && (
                     <>
@@ -158,5 +161,5 @@ export default function MyProducts() {
         </div>
       </div>
     </div>
-  );
+  </>);
 }

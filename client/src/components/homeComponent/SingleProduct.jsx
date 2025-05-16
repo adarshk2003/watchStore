@@ -4,8 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { addToCart } from './cartUtil';
 import { FaShoppingCart, FaHeart, FaRegHeart, FaBolt } from 'react-icons/fa';
-import NavBar from './Nav';
-
+import NavBaruser from '../navComponent/userNav';
 const baseUrl = 'http://localhost:7000';
 
 function SingleProduct() {
@@ -92,13 +91,27 @@ function SingleProduct() {
       toast.success('Added to Wishlist!');
     }
   };
-
+  
+  const handleBuyNow = () => {
+    navigate("/Checkout", {
+      state: {
+        cartItems: [
+          {
+            productId: product,
+            quantity: 1,
+          },
+        ],
+        total: product.price,
+      },
+    });
+  };
+  
   if (!product) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   return (
   <>
-  <NavBar/>
+  <NavBaruser/>
     <div className="flex flex-col gap-8 p-6">
       {/* Product Images and Features */}
       <div className="flex flex-col lg:flex-row gap-8">
@@ -127,7 +140,7 @@ function SingleProduct() {
           <h1 className="text-3xl font-bold">{product.title}</h1>
           <h2 className="text-lg text-gray-600">Brand: {product.brand}</h2>
           <p>{product.description}</p>
-          <h3 className="text-2xl font-semibold text-green-700">€{product.price}</h3>
+          <h3 className="text-2xl font-semibold text-green-700">₹{product.price}</h3>
 
 
           {/* Buttons */}
@@ -141,7 +154,7 @@ function SingleProduct() {
             </button>
 
             <button
-              onClick={() => navigate(`/checkout/${product._id}`)}
+            onClick={handleBuyNow}
               className="px-6 py-3 rounded-lg text-emerald-900 border border-emerald-900 bg-transparent flex items-center gap-2"
             >
               <FaBolt /> Buy Now
@@ -187,8 +200,10 @@ function SingleProduct() {
                 alt={product.title}
                 className="w-full h-32 object-cover object-center"
               />
-              <h3>{product.title}</h3>
-              <p>€{product.price}</p>
+<h3>
+  {product.title.length > 30 ? product.title.slice(0, 30) + '...' : product.title}
+</h3>
+              <p>₹{product.price}</p>
             </div>
           ))}
         </div>

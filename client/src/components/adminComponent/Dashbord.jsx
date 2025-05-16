@@ -242,7 +242,7 @@ const DashboardAdmin = () => {
       </div>
 
       {/* Orders Section */}
-      <div className="bg-white p-6 rounded-lg shadow mt-8">
+      {/* <div className="bg-white p-6 rounded-lg shadow mt-8">
         <h2 className="text-lg font-semibold mb-4 text-gray-700">Order Management</h2>
         <div className="space-y-4">
           {orders.map((order) => (
@@ -273,7 +273,7 @@ const DashboardAdmin = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
  </> );
 };

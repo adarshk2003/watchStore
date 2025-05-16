@@ -132,7 +132,7 @@ const SingleUser = () => {
                       <p className="text-gray-600 text-md mb-4">{product.brand}</p>
                       <div className="flex justify-between items-center">
                         <button
-                          onClick={() => navigate(`/product/${product._id}`)}
+                          onClick={() => navigate(`/products/${product._id}`)}
                           className="text-indigo-600 hover:text-indigo-800 text-lg font-semibold flex items-center"
                         >
                           <FaEye className="mr-2" /> View

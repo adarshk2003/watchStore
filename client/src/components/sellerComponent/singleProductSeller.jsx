@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import NavSellerCom from './NavSellerCom';
 const baseUrl = 'http://localhost:7000';
 
 function SingleProductSeller() {
@@ -45,7 +45,8 @@ function SingleProductSeller() {
   if (!product) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
-  return (
+  return (<>
+  <NavSellerCom/>
     <div className="flex flex-col gap-8 p-6">
       {/* Product Images and Features */}
       <div className="flex flex-col lg:flex-row gap-8">
@@ -74,7 +75,7 @@ function SingleProductSeller() {
           <h1 className="text-3xl font-bold">{product.title}</h1>
           <h2 className="text-lg text-gray-600">Brand: {product.brand}</h2>
           <p>{product.description}</p>
-          <h3 className="text-2xl font-semibold text-green-700">€{product.price}</h3>
+          <h3 className="text-2xl font-semibold text-green-700">₹{product.price}</h3>
 
           {/* Product Features */}
           <div className="bg-gray-100 p-4 rounded-lg shadow-md">
@@ -106,16 +107,19 @@ function SingleProductSeller() {
               <img
                 src={`${baseUrl}/${product.product_images[0]}`}
                 alt={product.title}
-                className="w-32 h-32 object-cover"
+                className="w-60 h-32 object-cover"
               />
-              <h3>{product.title}</h3>
-              <p>€{product.price}</p>
+            <h3>
+  {product.title.length > 30 ? `${product.title.substring(0, 30)}...` : product.title}
+</h3>
+
+              <p>₹{product.price}</p>
             </div>
           ))}
         </div>
       </div>
     </div>
-  );
+ </> );
 }
 
 export default SingleProductSeller;

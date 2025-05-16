@@ -117,7 +117,7 @@ export default function OthersProductList() {
             />
             <div className="p-4">
               <h4 className="text-lg font-bold capitalize">{product.title}</h4>
-              <p className="text-gray-900 font-semibold mt-2">€ {product.price}</p>
+              <p className="text-gray-900 font-semibold mt-2">₹ {product.price}</p>
               <h4 className="text-md font-semibold text-gray-700 mt-2 line-clamp-1">{product.description}</h4>
               <p className="text-gray-500 mt-2 capitalize">{product.category}</p>
               {isInWishlist(product._id) && (

@@ -18,6 +18,8 @@ router.get('/product/:id', setAccessControl('*'), productController.viewSinglePr
 
 router.get('/products/user/:id', productController.viewProductsByUser);
 
+router.delete('/product/:productId',setAccessControl('1,3'), productController.deleteProduct);
+
 router.get('/products/seller/:userId', productController.getProductsByUser);
 
 router.get('/products/category/:category', productController.viewProductsByCategory);
@@ -26,7 +28,6 @@ router.post('/blockP', setAccessControl('1'), productController.blockProduct);
 
 router.post('/unblockP', setAccessControl('1'), productController.unblockProduct);
 
-// router.put('/products/:Id', setAccessControl('3'), productController.updateProduct);
-
+router.put("/products/:productId", productController.updateProduct);
 
 module.exports = router;

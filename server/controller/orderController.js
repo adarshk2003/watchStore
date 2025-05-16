@@ -2,6 +2,7 @@ const order = require('../db/models/orders');
 const jwt = require('jsonwebtoken');
 const Product = require('../db/models/product');
 const { success_function, error_function } = require('../utils/response-handler');
+const Cart=require('../db/models/cart')
 
 const authenticate = (req, res, next) => {
     const authorizationHeader = req.header('Authorization');
@@ -99,8 +100,20 @@ exports.createOrder = [
                 );
             }
 
-            // Respond with the created order
-            res.status(201).json({ message: 'Order created successfully', order: savedOrder });
+            // Update the cart to remove only the purchased items
+      const cart = await Cart.findOne({ userId });
+      if (cart) {
+        // Filter out the items that were purchased from the cart
+        const updatedCartItems = cart.items.filter(item => 
+          !products.some(product => product.productId.toString() === item.productId.toString())
+        );
+
+        cart.items = updatedCartItems; // Update the cart with remaining items
+        await cart.save();
+      }
+
+      // Respond with the created order
+      res.status(201).json({ message: 'Order created successfully', order: savedOrder });
         } catch (error) {
             console.error('Error creating order:', error);
             res.status(500).json({ message: 'Internal server error' });

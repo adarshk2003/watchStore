@@ -27,6 +27,10 @@ function NavBar({ onProductSelect }) {
   const [loading, setLoading] = useState(false);
   const [isSearchContentVisible, setIsSearchContentVisible] = useState(false);
   const [isMegaMenuVisible, setIsMegaMenuVisible] = useState(false);
+  const [isSecurity, setIsSecutrity] = useState(false);
+  const toggleDropdown= () => setIsMegaMenuVisible(!isMegaMenuVisible);
+  const toggleDropdown2= () => setIsSecutrity(!isSecurity);
+
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -92,7 +96,6 @@ function NavBar({ onProductSelect }) {
       setIsSearchContentVisible(false);
     }
   }, [searchQuery, products]);
-  
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -139,46 +142,22 @@ function NavBar({ onProductSelect }) {
 
       {/* Main Navigation Bar */}
       <div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm">
-        <a href="/">
+        <Link to='/home'>
           <h1 className="hover:scale-105 transition-all font-russo-one text-2xl hover:text-emerald-800">
             CLYRO
           </h1>
-        </a>
+        </Link>
         <ul className="hidden md:flex items-center gap-10 font-semibold text-base">
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Home</li>
-          <li
-            className="relative hover:underline hover:text-emerald-800 cursor-pointer"
-            onMouseEnter={() => setIsMegaMenuVisible(true)}
-            onMouseLeave={() => setIsMegaMenuVisible(false)}
-          >
-            Category
-            {isMegaMenuVisible && (
-              <div className="absolute top-full left-0 w-full bg-white shadow-lg p-4 flex flex-wrap">
-                <div className="w-1/2 md:w-1/3 lg:w-1/4">
-                  <h3 className="font-bold text-lg mb-2">Categories</h3>
-                  <ul>
-                    {categories.map((category, index) => (
-                      <li key={index} className="py-1 hover:text-emerald-800">
-                        {category}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="w-1/2 md:w-1/3 lg:w-1/4">
-                  <h3 className="font-bold text-lg mb-2">Brands</h3>
-                  <ul>
-                    {brands.map((brand, index) => (
-                      <li key={index} className="py-1 hover:text-emerald-800">
-                        {brand}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+          <li className="hover:underline hover:text-emerald-800 cursor-pointer">home</li>
+          <li onClick={toggleDropdown}
+            className=" hover:underline hover:text-emerald-800 cursor-pointer"
+            // onMouseEnter={() => setIsMegaMenuVisible(true)}
+            // onMouseLeave={() => setIsMegaMenuVisible(false)}
+          > categories
           </li>
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Explore</li>
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Shop</li>
+          <Link to='/shop'><li className="hover:underline hover:text-emerald-800 cursor-pointer">explore</li></Link>
+          <Link><li  onClick={toggleDropdown2}
+          className="hover:underline hover:text-emerald-800 cursor-pointer">security</li></Link>
         </ul>
         <div className="flex items-center justify-center">
           <Link to="/wishlist">
@@ -202,9 +181,8 @@ function NavBar({ onProductSelect }) {
           <FontAwesomeIcon icon={faBars} />
         </i>
         <div
-          className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
-            isMenuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${isMenuOpen ? 'opacity-100' : 'opacity-0'
+            }`}
           style={{ zIndex: 50, transition: 'transform 0.3s ease, opacity 0.3s ease' }}
         >
           <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
@@ -274,6 +252,78 @@ function NavBar({ onProductSelect }) {
           </div>
         </div>
       )}
+      {/* categoryes */}
+      {isMegaMenuVisible && (
+        <div className={`top-full left-0 w-full bg-white border-slate-950 border-b-2 border-l-2 border-r-2 p-4 flex flex-wrap items-center justify-center transform transition-transform ${isMegaMenuVisible} ` }
+        style={{transition: 'transform 0.3s ease, opacity 0.3s ease', }}>
+          <div className="w-1/2 md:w-1/3 lg:w-1/4">
+            <h3 className="font-bold text-lg mb-2">Categories</h3>
+            <ul>
+              {categories.map((category, index) => (
+                <li key={index} className="py-1 hover:text-emerald-800">
+                  {category}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="w-1/2 md:w-1/3 lg:w-1/4">
+            <h3 className="font-bold text-lg mb-2">Brands</h3>
+            <ul>
+              {brands.map((brand, index) => (
+                <li key={index} className="py-1 hover:text-emerald-800">
+                  {brand}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="w-1/2 md:w-1/3 lg:w-1/4">
+            <h3 className="font-bold text-lg mb-2">collections</h3>
+            <ul>
+              {brands.map((brand, index) => (
+                <li key={index} className="py-1 hover:text-emerald-800">
+                  {brand}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+     {isSecurity && (
+  <div
+    className={`top-full left-0 w-full bg-white border-slate-950 shadow-md p-4 flex flex-wrap items-center justify-center transform transition-transform ${isMegaMenuVisible}`}
+    style={{ transition: 'transform 0.3s ease, opacity 0.3s ease' }}
+  >
+    <div className="text-center w-full">
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+        Product Protection & Buyer Security
+      </h3>
+      <p className="text-gray-600 mb-4">
+        We understand the importance of secure shopping. All your transactions are backed with our full buyer protection policy to ensure a worry-free shopping experience.
+      </p>
+      <div className="flex flex-wrap justify-center gap-4">
+        <div className="bg-green-100 p-4 rounded-md shadow-md w-80 text-center">
+          <h4 className="font-semibold text-green-700">Guaranteed Authenticity</h4>
+          <p className="text-sm text-green-600">
+            We only offer verified products, ensuring 100% authenticity of every item.
+          </p>
+        </div>
+        <div className="bg-blue-100 p-4 rounded-md shadow-md w-80 text-center">
+          <h4 className="font-semibold text-blue-700">Buyer Protection</h4>
+          <p className="text-sm text-blue-600">
+            If there is any issue with your purchase, you’re covered by our easy return and refund policy.
+          </p>
+        </div>
+        <div className="bg-yellow-100 p-4 rounded-md shadow-md w-80 text-center">
+          <h4 className="font-semibold text-yellow-700">Secure Payments</h4>
+          <p className="text-sm text-yellow-600">
+            All payments are encrypted and processed securely through trusted providers.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { FaEye, FaTrash, FaSpinner, FaBan, FaUnlockAlt } from "react-icons/fa";
+import { FaEye, FaTrash, FaSpinner, FaBan, FaUnlockAlt, FaCheck, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import NavAdmin from "./AdminNav";
@@ -16,7 +16,7 @@ const Allusers = () => {
   const [deleting, setDeleting] = useState(null);
   const [showUpgradeRequests, setShowUpgradeRequests] = useState(false);
   const [approveError, setApproveError] = useState("");
-
+  const token = localStorage.getItem("authToken");
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -112,27 +112,38 @@ const Allusers = () => {
       setApproveError(err.response?.data?.message || "Something went wrong");
     }
   };
-
-  const handleRejectRequest = async (requestId) => {
+  const handleReject = async (requestId) => {
     try {
-      await axios.delete(`http://localhost:7000/rejectUpgrade/${requestId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
-      setUpgradeRequests((prevRequests) =>
-        prevRequests.filter((request) => request._id !== requestId)
+      const response = await axios.delete(
+        `http://localhost:7000/rejectUpgrade/${requestId}`,
+       
+        
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
       );
-      toast.success("Upgrade request rejected.");
+      
+      if (response.status === 200) {
+        setUpgradeRequests((prevRequests) =>
+          prevRequests.filter((request) => request._id !== requestId)
+        );
+        toast.success("Upgrade request rejected.");
+      } else {
+        throw new Error("Failed to reject the upgrade request.");
+      }
     } catch (err) {
-      toast.error("Failed to reject upgrade request.");
+      const errorMessage = err.response?.data?.message || err.message || "Something went wrong";
+      setApproveError(errorMessage);
+      toast.error(errorMessage);  // Optionally show an error toast
     }
   };
-
+  
   const deleteUser = async (userId) => {
     setDeleting(userId);
     try {
-      await axios.delete(`http://localhost:7000/users/${userId}`, {
+      await axios.delete(`http://localhost:7000/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -168,7 +179,7 @@ const Allusers = () => {
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -176,87 +187,95 @@ const Allusers = () => {
       </div>
     );
   }
+  
   return (
     <>
       <NavAdmin />
       <div className="p-6 bg-gray-100 min-h-screen">
-        <h2 className="text-3xl font-bold mb-6 text-center">Users</h2>
-
+        <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">User Management</h2>
+  
         {/* Search Bar */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-8">
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 w-full sm:w-1/2 md:w-1/3 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            className="px-5 py-3 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 border border-gray-300 rounded-lg shadow focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
-         {/* Upgrade Requests Section */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-semibold mb-4 bg-blue-200 p-4 rounded-md">Upgrade Requests</h3>
+  
+        {/* Upgrade Requests Section */}
+        <section className="mb-10">
+          <h3 className="text-3xl font-semibold mb-6 text-gray-700 bg-blue-200 py-4 px-6 rounded-lg shadow">
+            Upgrade Requests
+          </h3>
           {upgradeRequests.length === 0 ? (
-            <p className="text-center">No upgrade requests found.</p>
+            <p className="text-center text-gray-600 italic">No upgrade requests found.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {upgradeRequests.map((request) => (
                 <div
                   key={request._id}
-                  className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-200 text-center"
-                >
-                  <h4 className="text-lg font-semibold">{request.companyName}</h4>
-                  <p className="text-sm text-gray-600">{request.email}</p>
-                  <p className="text-sm text-gray-600">License: {request.license}</p>
-                  <div className="flex justify-center mt-4 gap-3">
+                  className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition transform hover:scale-105 duration-200"
+                ><h4 className="text-lg font-semibold text-gray-800">{request.userId.name}</h4>
+                  <h4 className="text-lg font-semibold text-gray-800">{request.companyName}</h4>
+                  <p className="text-sm text-gray-500">{request.userId.email}</p>
+                  <p className="text-sm text-gray-500">License: {request.license}</p>
+                  <div className="flex justify-center mt-6 gap-4">
                     <button
                       onClick={() => handleApproveRequest(request._id)}
-                      className="px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg"
+                      className="px-4 py-2 bg-green-600 hover:bg-green-800 text-white rounded-lg shadow"
                     >
                       Approve
                     </button>
                     <button
-                      onClick={() => handleRejectRequest(request._id)}
-                      className="px-4 py-2 bg-red-700 hover:bg-red-900 text-white rounded-lg"
+                      onClick={() => handleReject(request._id)}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-800 text-white rounded-lg shadow"
                     >
-                      Reject
+                      reject
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-
+        </section>
+  
         {/* Sellers Section */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-semibold mb-4 bg-black/10 rounded-md p-4">Sellers</h3>
+        <section className="mb-10">
+          <h3 className="text-3xl font-semibold mb-6 text-gray-700 bg-gray-200 py-4 px-6 rounded-lg shadow">
+            Sellers
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {sellers.map((user) => (
               <div
                 key={user._id}
-                className="bg-black/20 shadow-md rounded-lg p-4 hover:shadow-lg transition duration-200 text-center"
+                className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition transform hover:scale-105 duration-200"
               >
-                <h3 className="text-lg font-semibold capitalize text-black">{user.name}</h3>
-                <p className="text-sm text-gray-600">{user.email}</p>
-                {/* Buttons Container */}
-                <div className="flex justify-center mt-4 gap-3">
+                <h3 className="text-lg font-semibold capitalize text-gray-800">{user.name}</h3>
+                <p className="text-sm text-gray-500">{user.email}</p>
+                <div className="flex justify-center mt-6 gap-4">
                   <button
                     onClick={() => deleteUser(user._id)}
                     disabled={deleting === user._id}
-                    className={`px-4 py-2 rounded-lg text-white ${deleting === user._id ? "bg-gray-400" : "bg-red-600 hover:bg-red-800"}`}
+                    className={`px-4 py-2 rounded-lg text-white shadow ${
+                      deleting === user._id ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-800"
+                    }`}
                   >
                     {deleting === user._id ? <FaSpinner spin /> : <FaTrash />}
                   </button>
                   <button
                     onClick={() => navigate(`/user/${user._id}`)}
-                    className="px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-800 text-white rounded-lg shadow"
                   >
                     <FaEye />
                   </button>
                   <button
                     onClick={() => (user.isBlocked ? handleUnblockUser(user._id) : handleBlockUser(user._id))}
-                    className={`px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${user.isBlocked ? "bg-yellow-600 hover:bg-yellow-800" : "bg-red-600 hover:bg-red-800"}`}
-                    title={user.isBlocked ? "Unblock User" : "Block User"}
+                    className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 shadow ${
+                      user.isBlocked ? "bg-yellow-600 hover:bg-yellow-800" : "bg-red-600 hover:bg-red-800"
+                    }`}
                   >
                     {user.isBlocked ? <FaUnlockAlt /> : <FaBan />}
                     {user.isBlocked ? "Unban" : "Ban"}
@@ -265,38 +284,42 @@ const Allusers = () => {
               </div>
             ))}
           </div>
-        </div>
-
+        </section>
+  
         {/* Customers Section */}
-        <div>
-          <h3 className="text-2xl font-semibold mb-4 bg-green-950/10 rounded-md p-4">Customers</h3>
+        <section>
+          <h3 className="text-3xl font-semibold mb-6 text-gray-700 bg-green-200 py-4 px-6 rounded-lg shadow">
+            Customers
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {customers.map((user) => (
               <div
                 key={user._id}
-                className="bg-black/30 shadow-md rounded-lg p-4 hover:shadow-lg transition duration-200 text-center"
+                className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition transform hover:scale-105 duration-200"
               >
-                <h3 className="text-lg font-semibold capitalize text-black">{user.name}</h3>
-                <p className="text-sm text-gray-600">{user.email}</p>
-                {/* Buttons Container */}
-                <div className="flex justify-center mt-4 gap-3">
+                <h3 className="text-lg font-semibold capitalize text-gray-800">{user.name}</h3>
+                <p className="text-sm text-gray-500">{user.email}</p>
+                <div className="flex justify-center mt-6 gap-4">
                   <button
                     onClick={() => deleteUser(user._id)}
                     disabled={deleting === user._id}
-                    className={`px-4 py-2 rounded-lg text-white ${deleting === user._id ? "bg-gray-400" : "bg-red-600 hover:bg-red-800"}`}
+                    className={`px-4 py-2 rounded-lg text-white shadow ${
+                      deleting === user._id ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-800"
+                    }`}
                   >
                     {deleting === user._id ? <FaSpinner spin /> : <FaTrash />}
                   </button>
                   <button
                     onClick={() => navigate(`/user/${user._id}`)}
-                    className="px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-800 text-white rounded-lg shadow"
                   >
                     <FaEye />
                   </button>
                   <button
                     onClick={() => (user.isBlocked ? handleUnblockUser(user._id) : handleBlockUser(user._id))}
-                    className={`px-4 py-2 rounded-lg text-white flex items-center justify-center gap-2 ${user.isBlocked ? "bg-yellow-600 hover:bg-yellow-800" : "bg-red-600 hover:bg-red-800"}`}
-                    title={user.isBlocked ? "Unblock User" : "Block User"}
+                    className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 shadow ${
+                      user.isBlocked ? "bg-yellow-600 hover:bg-yellow-800" : "bg-red-600 hover:bg-red-800"
+                    }`}
                   >
                     {user.isBlocked ? <FaUnlockAlt /> : <FaBan />}
                     {user.isBlocked ? "Unban" : "Ban"}
@@ -305,10 +328,11 @@ const Allusers = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </>
   );
+  
 };
 
 export default Allusers;

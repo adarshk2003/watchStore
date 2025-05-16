@@ -175,8 +175,51 @@ function ProductGrid({ selectedProducts }) {
     setCurrentPage(pageNumber);
   };
 
-  if (loading) return <div className="loader">Loading...</div>;
-  if (error) return <div className="error-message">{error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="relative">
+          {/* Outer Glow */}
+          <div className="absolute inset-0 animate-ping rounded-full border-4 border-opacity-30 border-blue-500"></div>
+          {/* Main Spinner */}
+          <div className="h-16 w-16 rounded-full border-4 border-t-blue-500 border-gray-200 animate-spin"></div>
+        </div>
+        <p className="mt-4 text-lg text-gray-700">Loading, please wait...</p>
+      </div>
+    );
+  
+  if (error)
+    return (
+      <div className="flex items-center justify-center h-screen bg-red-50">
+        <div className="text-center">
+          <div className="text-red-600 text-6xl mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-16 h-16"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.34 3.05a8.38 8.38 0 013.32 0c1.4.27 2.68.92 3.73 1.93a8.78 8.78 0 012.25 6.74c-.18 2.47-.97 4.5-2.29 5.97a8.93 8.93 0 01-5.4 3.22c-1.58.27-3.18.09-4.63-.52-1.4-.58-2.64-1.47-3.63-2.65a8.99 8.99 0 01-1.82-6.09c.24-2.66 1.36-4.92 3.15-6.62a9.17 9.17 0 015.32-2.14z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-semibold text-red-600">Oops!</h2>
+          <p className="text-gray-700 text-lg mt-2">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-6 px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  
 
   return (
     <div>
@@ -187,9 +230,9 @@ function ProductGrid({ selectedProducts }) {
           className="border p-2 rounded-md outline-none w-full sm:w-auto"
         >
           <option value="">Filter by Price</option>
-          <option value="100-1000">€100 - €1000</option>
-          <option value="1000-10000">€1000 - €10000</option>
-          <option value="10000-above">€10000 and above</option>
+          <option value="100-1000">₹100 - ₹1000</option>
+          <option value="1000-10000">₹1000 - ₹10000</option>
+          <option value="10000-above">₹10000 and above</option>
         </select>
         <select
           value={selectedBrand}
@@ -250,7 +293,7 @@ function ProductGrid({ selectedProducts }) {
                     </p>
                     <div className="flex items-center">
                       <p className="text-lg font-semibold text-black cursor-auto my-3">
-                        €{product.price || "N/A"}
+                      ₹{product.price || "N/A"}
                       </p>
                     </div>
                     <p
@@ -333,7 +376,7 @@ function ProductGrid({ selectedProducts }) {
                 </p>
                 <div className="flex items-center">
                   <p className="text-lg font-semibold text-black cursor-auto my-3">
-                    €{product.price || "N/A"}
+                  ₹{product.price || "N/A"}
                   </p>
                 </div>
                 <p
@@ -393,6 +436,11 @@ function ProductGrid({ selectedProducts }) {
           </button>
         ))}
       </div>
+        {/* popular brands */}
+        <div>
+          
+        </div>
+        {/* explore clyro */}
     </div>
   );
 }

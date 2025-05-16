@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import NavSellerCom from './NavSellerCom';
 import { toast } from 'react-toastify';
 import {
   LineChart,
@@ -111,9 +112,10 @@ const DashboardSeller = () => {
 
   if (!dateFns) return <div>Loading...</div>;
 
-  return (
+  return (<>
+  <NavSellerCom/>
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-700">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-700">seller Dashboard</h1>
 
       {/* Filters */}
       <div className="mb-6">
@@ -196,7 +198,7 @@ const DashboardSeller = () => {
         </ResponsiveContainer>
       </div>
     </div>
-  );
+ </>);
 };
 
 export default DashboardSeller;

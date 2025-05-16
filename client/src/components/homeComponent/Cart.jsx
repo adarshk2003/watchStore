@@ -180,7 +180,7 @@ export default function Cart() {
                             {product?.title || "Product not available"}
                           </h2>
                           <p className="text-gray-600 mt-1">
-                            € {(product?.price || 0).toFixed(2)}
+                            ₹ {(product?.price || 0).toFixed(2)}
                           </p>
                           {isBlocked ? (
                             <p className="text-red-600 font-bold">Currently Unavailable</p>
@@ -235,7 +235,7 @@ export default function Cart() {
                 <p className="mt-2">
                   Total Amount: 
                   <span className="font-bold text-green-600">
-                    € {calculateTotal()}
+                    ₹ {calculateTotal()}
                   </span>
                 </p>
               </div>

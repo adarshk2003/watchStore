@@ -18,20 +18,21 @@ import { useNavigate } from 'react-router-dom';
 function NavBaruser() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate=useNavigate();
-
+    const handleBack = () => {
+      navigate(-1); 
+    };
   return (
     <>
       <div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm">
-        <a href="">
+        <Link to='/home'>
           <h1 className="hover:scale-105 transition-all font-russo-one text-2xl hover:text-emerald-800">
             CLYRO
           </h1>
-        </a>
+        </Link>
         <ul className="hidden md:flex items-center gap-10 font-semibold text-base">
         <Link to='/home'>  <li className="hover:underline hover:text-emerald-800 cursor-pointer">Home</li></Link>
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Category</li>
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Explore</li>
-          <li className="hover:underline hover:text-emerald-800 cursor-pointer">Shop</li>
+          <Link to='/shop'><li className="hover:underline hover:text-emerald-800 cursor-pointer">Explore</li></Link>
+          <Link><li onClick={handleBack} className="hover:underline hover:text-emerald-800 cursor-pointer">Back</li></Link>
         </ul>
         <div className="flex items-center justify-center">
           <Link to="/wishlist">

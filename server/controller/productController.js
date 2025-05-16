@@ -132,7 +132,61 @@ exports.viewProducts = async function (req, res) {
     }
 
 }
-
+exports.deleteProduct = [
+    authenticate,
+    async (req, res) => {
+      try {
+        const userId = req.user.id; // Logged-in user's ID
+        const { productId } = req.params; // Product ID from request params
+  
+        console.info(`[INFO]: Delete request received for Product ID: ${productId} by User ID: ${userId}`);
+  
+        // Validate productId
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          console.warn(`[WARN]: Invalid Product ID: ${productId}`);
+          return res.status(400).json({ message: "Invalid product ID." });
+        }
+  
+        // Log the start of the search process
+        console.debug(`[DEBUG]: Searching for product with ID: ${productId} and User ID: ${userId}`);
+  
+        // Find and delete the product if it exists and belongs to the logged-in user
+        const product = await products.findOneAndDelete({
+          _id: productId,
+          $or: [
+            { userId },
+            { createdBy: userId },
+            { seller: userId },
+          ],
+        });
+  
+        if (!product) {
+          console.warn(`[WARN]: Product not found or user does not have permission. Product ID: ${productId}, User ID: ${userId}`);
+          return res.status(404).json({
+            message: "Product not found or you do not have permission to delete this product.",
+          });
+        }
+  
+        // Successful deletion
+        console.info(`[INFO]: Product deleted successfully. Product ID: ${productId}, User ID: ${userId}`);
+        return res.status(200).json({
+          message: `Product "${product.title}" deleted successfully.`,
+        });
+  
+      } catch (error) {
+        // Log the error
+        console.error(
+          `[ERROR]: Error deleting product. User ID: ${req.user.id}, Product ID: ${req.params.productId}`,
+          error
+        );
+  
+        // Send response
+        return res.status(500).json({
+          message: "An error occurred while deleting the product. Please try again later.",
+        });
+      }
+    },
+  ];
 //view single product
 
 exports.viewSingleProduct = async function (req, res) {
@@ -288,50 +342,48 @@ exports.unblockProduct = [authenticate, async function (req, res) {
     }
 }];
 
-//update product
 exports.updateProduct = [
     authenticate,
     async (req, res) => {
-        try {
-            console.log("Request Params:", req.params); // Log all route params
-            console.log("Request Body:", req.body); // Log body for debugging
-
-            const { productId } = req.params;
-
-            // Check if productId is missing
-            if (!productId) {
-                return res.status(400).json({ message: "Product ID is missing from the URL." });
-            }
-
-            // Validate productId format
-            if (!mongoose.Types.ObjectId.isValid(productId)) {
-                return res.status(400).json({ message: "Invalid Product ID format." });
-            }
-
-            // Proceed with finding and updating the product
-            const updateData = req.body;
-            const userId = req.user.id;
-
-            // Check if the product belongs to the user
-            const product = await products.findOne({ _id: productId, userId });
-            if (!product) {
-                return res.status(404).json({ message: "Product not found or unauthorized." });
-            }
-
-            // Update the product
-            const updatedProduct = await products.findByIdAndUpdate(productId, updateData, {
-                new: true,
-                runValidators: true,
-            });
-
-            // Return updated product data in the response
-            return res.status(200).json({
-                message: "Product updated successfully.",
-                data: updatedProduct,
-            });
-        } catch (error) {
-            console.error("Error updating product:", error);
-            return res.status(500).json({ message: "An error occurred.", error: error.message });
-        }
+      try {
+  
+        const userId = req.user.id; // Logged-in user's ID
+        const { productId } = req.params; // Product ID from request params
+        const updateData = req.body; // Product data to update from request body  
+        const product = await products.findOne({ _id: productId, seller: userId });
+  
+        if (!product) {
+          console.warn("Product not found or unauthorized update attempt:", {
+            productId,
+            userId,
+          });
+          return res.status(404).json({
+            message:
+              "Product not found or you do not have permission to update this product.",
+          });
+        }  
+        const updatedProduct = await products.findByIdAndUpdate(
+          productId,
+          updateData,
+          {
+            new: true,
+            runValidators: true,
+          }
+        );  
+        return res.status(200).json({
+          message: "Product updated successfully.",
+          data: updatedProduct,
+        });
+      } catch (error) {
+        console.error("Error updating product:", error);
+  
+        return res.status(500).json({
+          message:
+            error.message || "An error occurred while updating the product.",
+        });
+      }
     },
-];
+  ];
+   
+
+

@@ -8,7 +8,8 @@ const UpgradeRequest = require('../db/models/upgradeReq'); // Update the path as
 const { sendEmail } = require('../utils/sendemail');
 const { blockUserTemplate } = require('../utils/template/block-user');
 const{unblockUserTemplate}=require('../utils/template/unblock-user')
-const{upgradeToSellerTemplate}=require('../utils/template/upgrade-seller')
+const { upgradeApprovalNotification } = require('../utils/template/upgrade');
+const { upgradeRejectionNotification } = require('../utils/template/upgrade');
 
 const user_type=require('../db/models/user_type')
 const fileUpload = require('../utils/fileUpload').fileUpload;
@@ -229,7 +230,6 @@ exports.deleteUser=async function (req,res) {
         res.status(response.statusCode).send(response.statusCode);   
     }
 }
-
 // Controller function to view the logged-in user's profile
 exports.viewUserProfile = [authenticate,async function (req, res) {
     try {
@@ -427,17 +427,33 @@ exports.blockUser = [
 
 
   //upgrade seller request
-exports.requestUpgrade =[authenticate, async (req, res) => {
-    try { const userId = req.user.id;
-        const { companyName, license } = req.body;
-        const newRequest = new UpgradeRequest({ userId, companyName, license, status: 'pending' });
-        const savedRequest = await newRequest.save();
-        res.status(201).send({ message: 'Upgrade request submitted successfully', data: savedRequest });
-    } 
-    catch (error) {
-         res.status(500).send({ message: 'Something went wrong', error: error.message });
-    } 
-}];
+  exports.requestUpgrade = [authenticate, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { companyName, license } = req.body;
+  
+      // Check if there's already an active pending request from this user
+      const existingRequest = await UpgradeRequest.findOne({ userId, status: 'pending' });
+  
+      if (existingRequest) {
+        return res.status(400).send({ message: 'You already have a pending upgrade request.' });
+      }
+  
+      // Create a new request if no pending request exists
+      const newRequest = new UpgradeRequest({
+        userId,
+        companyName,
+        license,
+        status: 'pending',
+      });
+  
+      const savedRequest = await newRequest.save();
+      res.status(201).send({ message: 'Upgrade request submitted successfully', data: savedRequest });
+    } catch (error) {
+      res.status(500).send({ message: 'Something went wrong', error: error.message });
+    }
+  }];
+  
 
 //aprove upgrade
 exports.approveUpgrade = [authenticate, async (req, res) => { 
@@ -499,4 +515,44 @@ exports.getAllUpgradeRequests =[authenticate, async (req, res) => {
     catch (error) 
     { res.status(500).send({ message: 'Something went wrong', error: error.message }); 
     } 
+}];
+// Reject Upgrade Request
+exports.rejectUpgrade = [authenticate, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+
+        // Find the upgrade request
+        const upgradeRequest = await UpgradeRequest.findById(requestId).populate('userId');
+
+        if (!upgradeRequest) {
+            return res.status(404).send({ message: 'Upgrade request not found' });
+        }
+
+        // Generate email template for rejection
+        const emailTemplate = await upgradeRejectionNotification(
+            upgradeRequest.userId.name,
+            upgradeRequest.companyName
+        );
+
+        // Send rejection email notification
+        await sendEmail(
+            upgradeRequest.userId.email,
+            'Upgrade Request Rejected',
+            emailTemplate
+        );
+
+        // Delete the upgrade request
+        await UpgradeRequest.findByIdAndDelete(requestId);
+
+        res.status(200).send({
+            message: 'Upgrade request rejected and deleted',
+            rejectedRequest: {
+                userId: upgradeRequest.userId._id,
+                companyName: upgradeRequest.companyName,
+                license: upgradeRequest.license
+            }
+        });
+    } catch (error) {
+        res.status(500).send({ message: 'Something went wrong', error: error.message });
+    }
 }];

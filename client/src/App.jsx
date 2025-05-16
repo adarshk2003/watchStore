@@ -14,7 +14,6 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import Seller from './components/sellerComponent/Seller';
 import LoadingWrapper from './components/GraphicComponent/loadingWrapper';
 import Wishlist from './components/homeComponent/wishlist';
-import Collections from './components/homeComponent/collections';
 import Allusers from './components/adminComponent/Alluser';
 import SingleUser from './components/adminComponent/Singleuser';
 import WarningBlocked from './components/SecurityComponent/Usersblock';
@@ -25,6 +24,11 @@ import OrderDetailPage from './components/homeComponent/myOrders';
 import DashboardAdmin from './components/adminComponent/Dashbord';
 import DashboardSeller from './components/sellerComponent/exploreDetails';
 import SingleProductSeller from './components/sellerComponent/singleProductSeller';
+import NavBar from './components/homeComponent/Nav';
+import Shop from './components/homeComponent/Shop';
+import UpdateProductForm from './components/sellerComponent/updateProduct';
+import OrderConfirmation from './components/homeComponent/conformed';
+import BrandProducts from './components/homeComponent/Brandoroducts';
 library.add(fas);
 
 function App() {
@@ -32,12 +36,17 @@ function App() {
     <>
       <Router>
         <Routes>
+          {/* for testing */}
+          <Route path='/navuser' element={<NavBar/>}/>
           <Route path="/login" element={<LoadingWrapper> <LoginForm /> </LoadingWrapper>} />
+          <Route path="/shop" element={<LoadingWrapper> <Shop /> </LoadingWrapper>} />
           <Route path="/home" element={<LoadingWrapper> <Home /> </LoadingWrapper>} />
           <Route path='/signup' element={<LoadingWrapper> <SignUp /> </LoadingWrapper>} />
           <Route path='/addproduct' element={<LoadingWrapper> <AddProduct /> </LoadingWrapper>} />
           <Route path='/product/:id' element={<LoadingWrapper><ProductPage /></LoadingWrapper>} />
           <Route path='/products/:id' element={<LoadingWrapper><SingleProductSeller /></LoadingWrapper>} />
+          <Route path='/edit-product/:productId' element={<LoadingWrapper><UpdateProductForm /></LoadingWrapper>} />
+
 
           <Route path='/seller-home' element={<LoadingWrapper><Seller /></LoadingWrapper>} />
           <Route path='/profile'element={<LoadingWrapper><Profile/></LoadingWrapper>}/>
@@ -45,7 +54,6 @@ function App() {
           <Route path='/wishlist' element={<LoadingWrapper> <Wishlist /> </LoadingWrapper>} />
           <Route path='/adminav' element={<NavAdmin/>}/>
           <Route path='/cart' element={<LoadingWrapper> <Cart/></LoadingWrapper>} /> 
-          <Route path='/collections' element={<LoadingWrapper><Collections/></LoadingWrapper>} />
           <Route path='/user/:id'element={<LoadingWrapper><SingleUser/></LoadingWrapper>}/>
           <Route path='/alluser' element={<LoadingWrapper><Allusers/></LoadingWrapper>}/>
           <Route path='/blockeduser' element={<WarningBlocked/>}/>
@@ -53,12 +61,15 @@ function App() {
           <Route path='/support' element={<LoadingWrapper><ContactSupport/></LoadingWrapper>}/>
           <Route path='/Checkout/:id' element={<LoadingWrapper><Checkout/></LoadingWrapper>}/>
           <Route path='/Checkout' element={<LoadingWrapper><Checkout/></LoadingWrapper>}/>
+          <Route path='/conformed' element={<OrderConfirmation/>}/>
+          <Route path="/category/:brandName" element={<BrandProducts />} />
           <Route path='/orders' element={<LoadingWrapper><OrderDetailPage/></LoadingWrapper>}/>
           <Route path='/admin-home' element={<LoadingWrapper><DashboardAdmin/></LoadingWrapper>}/>
           <Route path='/dashboard-seller' element={<LoadingWrapper><DashboardSeller/></LoadingWrapper>}/>
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
+     
     </>
   )
 }

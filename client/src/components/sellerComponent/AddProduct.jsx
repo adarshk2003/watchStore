@@ -212,7 +212,6 @@ function AddProduct() {
             <option value="Fossil">Fossil</option>
             <option value="Michael Kors">Michael Kors</option>
             <option value="Daniel Wellington">Daniel Wellington</option>
-
           </select>
         </div>
 

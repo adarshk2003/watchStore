@@ -21,6 +21,8 @@ router.post('/block', setAccessControl('1'), userController.blockUser);
 router.post('/unblock', setAccessControl('1'), userController.unblockUser);
 router.post('/requestUpgrade',setAccessControl('2'), userController.requestUpgrade);
 router.put('/approveUpgrade/:id',setAccessControl('1'), userController.approveUpgrade);
-router.get('/upgradeRequests',setAccessControl('1'),  userController.getAllUpgradeRequests)
+router.get('/upgradeRequests',setAccessControl('1'),  userController.getAllUpgradeRequests);
+router.delete('/rejectUpgrade/:id', setAccessControl('1'), userController.rejectUpgrade);
+
 
 module.exports = router;
