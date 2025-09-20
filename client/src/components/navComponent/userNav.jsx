@@ -55,31 +55,42 @@ function NavBaruser() {
         >
           <FontAwesomeIcon icon={faBars} />
         </i>
-        <div
-          className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
-            isMenuOpen ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ zIndex: 50, transition: 'transform 0.3s ease, opacity 0.3s ease' }}
-        >
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faHome} /> Home
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faListAlt} /> Category
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faExplosion} /> Explore
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faShop} /> Shop
-          </li>
-            <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-              <FontAwesomeIcon icon={faSignOutAlt} /> 
-            </li>
-            <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-              <FontAwesomeIcon icon={faUser} /> Login
-            </li>
-        </div>
+     <div
+  className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
+    isMenuOpen ? 'opacity-100' : 'opacity-0'
+  }`}
+  style={{ zIndex: 50, transition: 'transform 0.3s ease, opacity 0.3s ease' }}
+>
+  <Link to="/home">
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faHome} /> Home
+    </li>
+  </Link>
+
+  <Link to="/category">
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faListAlt} /> Category
+    </li>
+  </Link>
+
+  <Link to="/explore">
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faExplosion} /> Explore
+    </li>
+  </Link>
+
+  <Link to="/shop">
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faShop} /> Shop
+    </li>
+  </Link>
+  <Link to="/login">
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faUser} /> Login
+    </li>
+  </Link>
+</div>
+
       </div>
     </>
   );
