@@ -17,14 +17,10 @@
   },
   "production": {
     "database": {
-      "protocol": "mongodb",
-      "username": "root",
-      "password": "password",
-      "name": "database_production",
-      "host": "localhost",
-      "port": "",
+      "url": "process.env.MONGODB_URI",
       "options": {
-        "useNewUrlParser": true
+        "useNewUrlParser": true,
+        "useUnifiedTopology": true
       }
     }
   }
