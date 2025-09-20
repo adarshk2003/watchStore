@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBars, faHome, faExplosion, faUser, faShop, faListAlt } from '@fortawesome/free-solid-svg-icons';
 import ProfileDropdownseller from './ProfileDropdownseller';
@@ -7,6 +7,12 @@ import axios from 'axios';
 function NavSeller() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userName, setUserName] = useState('');
+     const navigate = useNavigate();
+
+    const logout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/');
+  };
   useEffect(() => {
     const fetchUserName = async () => {
       const token = localStorage.getItem('authToken');
@@ -121,6 +127,13 @@ function NavSeller() {
       <FontAwesomeIcon icon={faUser} /> Login
     </li>
   </Link>
+         <li
+  className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer"
+  onClick={logout}  
+>
+  <FontAwesomeIcon icon={faUser} /> Logout
+</li>
+
 </div>
 
       </div>
