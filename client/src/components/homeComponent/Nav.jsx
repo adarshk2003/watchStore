@@ -209,7 +209,7 @@ function NavBar({ onProductSelect }) {
             </li>
           ) : (
             <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-              <FontAwesomeIcon icon={faUser} /> Login
+              <Link to="/login"><FontAwesomeIcon icon={faUser} /> Login</Link>
             </li>
           )}
         </div>
