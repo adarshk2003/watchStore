@@ -11,10 +11,10 @@
       "options": {}
     }
   },
-  "production": {
-    "database": {
-      "url": "",
-      "options": {}
-    }
+"production": {
+  "database": {
+    "url": "mongodb+srv://kadarsh122003_db_user:RkfT2zTMOWg0Q0B8@cluster0.9n2f2ui.mongodb.net/clyro_watch?retryWrites=true&w=majority",
+    "options": {}
   }
+}
 }
