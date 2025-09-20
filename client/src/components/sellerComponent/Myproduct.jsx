@@ -106,12 +106,12 @@ export default function MyProducts() {
               className={`bg-white shadow-md rounded-lg overflow-hidden transition-transform transform ${product.isStatus ? '' : 'hover:scale-105'
                 }`}
             >
-              <img
-                src={
-                  product.product_images && product.product_images.length > 0
-                    ? `${baseUrl}/${product.product_images[1]}`
-                    : './public/images/default-image.png'
-                }
+           <img
+  src={
+    product.product_images && product.product_images.length > 0
+      ? `${baseUrl}/${product.product_images[0]}`
+      : '/images/default-image.png'
+  }
                 alt={product.title}
                 className={`w-full h-40 object-cover ${product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'
                   }`}
