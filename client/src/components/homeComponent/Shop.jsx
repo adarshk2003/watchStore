@@ -234,10 +234,11 @@ const Shop = () => {
         <div className="col-span-3 bg-gray-50 overflow-y-auto p-4 no-scrollbar">
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {paginatedProducts.map((product) => {
-              const imageUrl =
-                product.product_images && product.product_images.length > 0
-                  ? `${baseUrl}/${product.product_images[0]}`
-                  : 'https://via.placeholder.com/150';
+           const imageUrl =
+  product.product_images && product.product_images.length > 0
+    ? product.product_images[0]  
+    : 'https://via.placeholder.com/150';
+
 
               const isInCart = cartItems.includes(product._id);
               const isInWishlist = wishlistItems.includes(product._id);
