@@ -120,12 +120,13 @@ const Wishlist = () => {
                 key={item.productId._id}
                 className="border relative rounded-lg shadow-md p-4 flex flex-col"
               >
-                <img
-                  onClick={() => navigateToProductDetails(item.productId._id)}
-                  src={`${baseUrl}/${item.productId.product_images[0]}`}
-                  alt={item.productId.title}
-                  className="w-full h-48 object-cover mb-4 hover:cursor-pointer"
-                />
+               <img
+  onClick={() => navigateToProductDetails(item.productId._id)}
+  src={item.productId.product_images[0] || 'https://via.placeholder.com/150'}
+  alt={item.productId.title}
+  className="w-full h-48 object-cover mb-4 hover:cursor-pointer"
+/>
+
                 <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
                   {item.productId.title}
                 </h2>
