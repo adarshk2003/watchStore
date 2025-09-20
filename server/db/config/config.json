@@ -2,26 +2,19 @@
   "development": {
     "database": {
       "url": "mongodb://localhost:27017/clyro_watch",
-      "options": {
-        "useNewUrlParser": true
-      }
+      "options": {}
     }
   },
   "test": {
     "database": {
       "url": "mongodb://localhost:27017/clyro_watch",
-      "options": {
-        "useNewUrlParser": true
-      }
+      "options": {}
     }
   },
   "production": {
     "database": {
-      "url": "process.env.MONGODB_URI",
-      "options": {
-        "useNewUrlParser": true,
-        "useUnifiedTopology": true
-      }
+      "url": "",
+      "options": {}
     }
   }
 }
