@@ -8,6 +8,10 @@ const dbConfig = config[env].database;
 
 const dbUri = env === 'production' ? process.env.MONGODB_URI : dbConfig.url;
 
-mongoose.connect(dbUri)
-  .then(() => console.log('Database connected!'))
-  .catch(err => console.error('Database connection error:', err));
+function mongoConnect() {
+  return mongoose.connect(dbUri)
+    .then(() => console.log('Database connected!'))
+    .catch(err => console.error('Database connection error:', err));
+}
+
+module.exports = mongoConnect;
