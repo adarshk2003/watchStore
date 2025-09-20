@@ -15,7 +15,7 @@ const BrandProducts = () => {
     // Fetch products from the /products endpoint
     const token = localStorage.getItem('authToken'); // Get token from localStorage
     axios
-      .get('http://localhost:7000/products', {
+      .get('https://watchstore-backends.onrender.com/products', {
         headers: {
           Authorization: `Bearer ${token}`, // Include token in the header
         },
@@ -57,7 +57,7 @@ const BrandProducts = () => {
         {products.map((product) => {
           const imageUrl =
             product.product_images && product.product_images.length > 0
-              ? `http://localhost:7000/${product.product_images[0]}`
+              ? `https://watchstore-backends.onrender.com/${product.product_images[0]}`
               : 'https://via.placeholder.com/150';
 
           return (
