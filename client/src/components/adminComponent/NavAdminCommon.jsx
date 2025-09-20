@@ -91,9 +91,13 @@ function NavAdminCommon() {
           <FontAwesomeIcon icon={faUser} /> Login
         </li>
       </Link>
-              <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-          <FontAwesomeIcon icon={faUser}  onClick={logout}/> Logout
-        </li>
+       <li
+  className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer"
+  onClick={logout}  
+>
+  <FontAwesomeIcon icon={faUser} /> Logout
+</li>
+
     </div>
   </div>
 </>
