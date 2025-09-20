@@ -23,7 +23,7 @@ export default function Cart() {
       }
 
       try {
-        const response = await axios.get("http://localhost:7000/viewCart", {
+        const response = await axios.get("https://watchstore-backends.onrender.com/viewCart", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -67,7 +67,7 @@ export default function Cart() {
 
     try {
       const response = await axios.patch(
-        `http://localhost:7000/updateCartQuantity`,
+        `https://watchstore-backends.onrender.com/updateCartQuantity`,
         { productId, quantity },
         {
           headers: {
@@ -99,7 +99,7 @@ export default function Cart() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:7000/deleteCart/${productId}`,
+        `https://watchstore-backends.onrender.com/deleteCart/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -169,7 +169,7 @@ export default function Cart() {
                           }
                           src={
                             product?.product_images?.length > 0
-                              ? `http://localhost:7000/${product.product_images[0]}`
+                              ? `https://watchstore-backends.onrender.com/${product.product_images[0]}`
                               : "/Omega.jpeg"
                           }
                           alt={product?.title || "Product Image"}
