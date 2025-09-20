@@ -53,10 +53,11 @@ function SingleProductSeller() {
         {/* Images */}
         <div className="flex flex-col w-full lg:w-1/2 gap-4">
           <img
-            src={`${baseUrl}/${mainImage}`}
-            alt={product.title}
-            className="w-full h-auto object-cover rounded-lg shadow-lg"
-          />
+  src={mainImage}  // <-- full URL, no baseUrl
+  alt={product.title}
+  className="w-full h-auto object-cover rounded-lg shadow-lg"
+/>
+
           <div className="flex gap-2">
             {product.product_images?.map((img, index) => (
          <img
