@@ -102,11 +102,12 @@ const OrderDetailPage = () => {
                     <div key={index} className="flex border-b-2 p-4 mb-4">
                       {productDetail ? (
                         <>
-                          <img
-                            src={`${baseUrl}/${productDetail.product_images[1]}`}
-                            alt={productDetail.title}
-                            className="w-24 h-24 object-cover mr-4 rounded-lg"
-                          />
+                       <img
+  src={productDetail.product_images[1] || 'https://via.placeholder.com/150'}
+  alt={productDetail.title}
+  className="w-24 h-24 object-cover mr-4 rounded-lg"
+/>
+
                           <div>
                             <h3 className="text-lg font-semibold">{productDetail.title}</h3>
                             <p className="text-gray-600">₹ {productDetail.price} x {product.quantity}</p>
