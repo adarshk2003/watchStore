@@ -16,7 +16,7 @@ export const addToCart = async (productId) => {
 
     // Make the POST request to add the product to the cart
     const response = await axios.post(
-      "http://localhost:7000/addCart",
+      "https://watchstore-backends.onrender.com/addCart",
       { productId },
       {
         headers: {

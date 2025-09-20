@@ -27,7 +27,7 @@ function ProductGrid({ selectedProducts }) {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12; // Display 12 products per page
 
-  const baseUrl = "http://localhost:7000";
+  const baseUrl = "https://watchstore-backends.onrender.com";
   const token = localStorage.getItem("authToken");
 
   useEffect(() => {

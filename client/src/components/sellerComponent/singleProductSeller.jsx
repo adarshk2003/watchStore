@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import NavSellerCom from './NavSellerCom';
-const baseUrl = 'http://localhost:7000';
+const baseUrl = 'https://watchstore-backends.onrender.com';
 
 function SingleProductSeller() {
   const { id } = useParams();

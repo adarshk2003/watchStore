@@ -10,7 +10,7 @@ export default function OthersProductList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const baseUrl = 'http://localhost:7000';
+  const baseUrl = 'https://watchstore-backends.onrender.com';
   const token = localStorage.getItem('authToken');
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();

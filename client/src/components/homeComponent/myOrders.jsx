@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import NavBaruser from "../navComponent/userNav";
 
-const baseUrl = 'http://localhost:7000';
+const baseUrl = 'https://watchstore-backends.onrender.com';
 
 const OrderDetailPage = () => {
   const [orders, setOrders] = useState([]);

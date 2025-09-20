@@ -20,7 +20,7 @@ const Allusers = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/users", {
+        const response = await axios.get("https://watchstore-backends.onrender.com/users", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -44,7 +44,7 @@ const Allusers = () => {
   useEffect(() => {
     const fetchUpgradeRequests = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/upgradeRequests", {
+        const response = await axios.get("https://watchstore-backends.onrender.com/upgradeRequests", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -62,7 +62,7 @@ const Allusers = () => {
   const handleBlockUser = async (userId) => {
     const payload = { userId };
     try {
-      await axios.post("http://localhost:7000/block", payload, {
+      await axios.post("https://watchstore-backends.onrender.com/block", payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -79,7 +79,7 @@ const Allusers = () => {
   const handleUnblockUser = async (userId) => {
     const payload = { userId };
     try {
-      await axios.post("http://localhost:7000/unblock", payload, {
+      await axios.post("https://watchstore-backends.onrender.com/unblock", payload, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -96,7 +96,7 @@ const Allusers = () => {
   const handleApproveRequest = async (requestId) => {
     try {
       await axios.put(
-        `http://localhost:7000/approveUpgrade/${requestId}`,
+        `https://watchstore-backends.onrender.com/approveUpgrade/${requestId}`,
         {},
         {
           headers: {
@@ -115,7 +115,7 @@ const Allusers = () => {
   const handleReject = async (requestId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:7000/rejectUpgrade/${requestId}`,
+        `https://watchstore-backends.onrender.com/rejectUpgrade/${requestId}`,
        
         
           {
@@ -143,7 +143,7 @@ const Allusers = () => {
   const deleteUser = async (userId) => {
     setDeleting(userId);
     try {
-      await axios.delete(`http://localhost:7000/user/${userId}`, {
+      await axios.delete(`https://watchstore-backends.onrender.com/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },

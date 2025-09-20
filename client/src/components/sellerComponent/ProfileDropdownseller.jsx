@@ -19,7 +19,7 @@ const navigate=useNavigate()
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:7000/user/${userId}`, {
+        const response = await axios.get(`https://watchstore-backends.onrender.com/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

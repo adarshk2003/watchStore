@@ -16,7 +16,7 @@ const Wishlist = () => {
 
   const token = localStorage.getItem("authToken");
   const navigate = useNavigate();
-  const baseUrl = "http://localhost:7000";
+  const baseUrl = "https://watchstore-backends.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {

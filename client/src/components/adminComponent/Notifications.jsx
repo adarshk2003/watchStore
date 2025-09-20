@@ -14,7 +14,7 @@ const NotificationPage = () => {
         const newNotifications = [];
 
         // Fetch products
-        const productsResponse = await axios.get('http://localhost:7000/products');
+        const productsResponse = await axios.get('https://watchstore-backends.onrender.com/products');
         const products = productsResponse.data.data;
 
         console.log('Products Data:', products);
@@ -41,7 +41,7 @@ const NotificationPage = () => {
         }
 
         // Fetch orders
-        const ordersResponse = await axios.get('http://localhost:7000/viewAllOrders');
+        const ordersResponse = await axios.get('https://watchstore-backends.onrender.com/viewAllOrders');
         const orders = ordersResponse.data.data;
 
         console.log('Orders Data:', orders);

@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaEye, FaBan, FaUnlockAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-const baseUrl = "http://localhost:7000";
+const baseUrl = "https://watchstore-backends.onrender.com";
 
 const SingleUser = () => {
   const { id } = useParams();

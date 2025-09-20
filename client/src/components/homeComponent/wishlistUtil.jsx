@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const baseUrl = 'http://localhost:7000';
+const baseUrl = 'https://watchstore-backends.onrender.com';
 
 // Add to Wishlist
 export const addToWishlist = async (productId, token, setWishlistItems) => {

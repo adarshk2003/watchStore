@@ -9,7 +9,7 @@ export default function MyProducts() {
   const [userProducts, setUserProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const baseUrl = 'http://localhost:7000';
+  const baseUrl = 'https://watchstore-backends.onrender.com';
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
   const userId = localStorage.getItem('userId');

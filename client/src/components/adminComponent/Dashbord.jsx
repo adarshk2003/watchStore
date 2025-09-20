@@ -31,7 +31,7 @@ const DashboardAdmin = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiBaseUrl = 'http://localhost:7000';
+        const apiBaseUrl = 'https://watchstore-backends.onrender.com';
         const headers = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -146,7 +146,7 @@ const DashboardAdmin = () => {
 
   const handleOrderStatusChange = async (orderId, status) => {
     try {
-      const apiBaseUrl = 'http://localhost:7000';
+      const apiBaseUrl = 'https://watchstore-backends.onrender.com';
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,

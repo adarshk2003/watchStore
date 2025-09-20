@@ -25,7 +25,7 @@ const Profile = () => {
   useEffect(() => {
     if (token) {
       axios
-        .get('http://localhost:7000/userprofile', {
+        .get('https://watchstore-backends.onrender.com/userprofile', {
           headers: {
             Authorization: `bearer ${token}`,
           },
@@ -61,7 +61,7 @@ const Profile = () => {
     if (token) {
       axios
         .put(
-          'http://localhost:7000/updateUser',
+          'https://watchstore-backends.onrender.com/updateUser',
           { ...formData },
           {
             headers: {
@@ -87,7 +87,7 @@ const Profile = () => {
 
       axios
         .post(
-          'http://localhost:7000/requestUpgrade',
+          'https://watchstore-backends.onrender.com/requestUpgrade',
           { ...upgradeData },
           {
             headers: {

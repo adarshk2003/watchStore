@@ -23,7 +23,7 @@ function Review() {
 
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://localhost:7000/user'); 
+                const response = await axios.get('https://watchstore-backends.onrender.com/user'); 
                 setUser(response.data);
             } catch (error) {
                 setError('Failed to fetch user data');
@@ -41,7 +41,7 @@ function Review() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:7000/reviews', {
+            await axios.post('https://watchstore-backends.onrender.com/reviews', {
                 userId: user.id,
                 sellerId,
                 rating,

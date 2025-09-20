@@ -26,7 +26,7 @@ const Shop = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
-  const baseUrl = 'http://localhost:7000';
+  const baseUrl = 'https://watchstore-backends.onrender.com';
 
   useEffect(() => {
     const fetchData = async () => {

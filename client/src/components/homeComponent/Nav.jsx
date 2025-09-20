@@ -41,7 +41,7 @@ function NavBar({ onProductSelect }) {
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:7000/user/${userId}`, {
+        const response = await axios.get(`https://watchstore-backends.onrender.com/user/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -56,7 +56,7 @@ function NavBar({ onProductSelect }) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:7000/products');
+        const response = await axios.get('https://watchstore-backends.onrender.com/products');
         if (response.data?.data) {
           setProducts(response.data.data);
           const uniqueCategories = [
@@ -236,7 +236,7 @@ function NavBar({ onProductSelect }) {
                   }}
                 >
                   <img
-                    src={`http://localhost:7000/${product.product_images?.[0] || 'placeholder.jpg'}`}
+                    src={`https://watchstore-backends.onrender.com/${product.product_images?.[0] || 'placeholder.jpg'}`}
                     alt={product.title || 'Product'}
                     className="w-full h-40 object-cover rounded-md"
                   />

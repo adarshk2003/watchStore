@@ -46,7 +46,7 @@ export default function Checkout() {
       };
 
       const response = await axios.post(
-        "http://localhost:7000/createOrder",
+        "https://watchstore-backends.onrender.com/createOrder",
         orderData,
         {
           headers: {

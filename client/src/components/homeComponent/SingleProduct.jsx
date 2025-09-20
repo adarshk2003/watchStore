@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { addToCart } from './cartUtil';
 import { FaShoppingCart, FaHeart, FaRegHeart, FaBolt } from 'react-icons/fa';
 import NavBaruser from '../navComponent/userNav';
-const baseUrl = 'http://localhost:7000';
+const baseUrl = 'https://watchstore-backends.onrender.com';
 
 function SingleProduct() {
   const { id } = useParams();

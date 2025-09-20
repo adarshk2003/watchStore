@@ -35,7 +35,7 @@ const UpdateProductForm = () => {
         }
 
         console.log(`Fetching product details for ID: ${productId}`); // Debug log
-        const response = await axios.get(`http://localhost:7000/product/${productId}`, {
+        const response = await axios.get(`https://watchstore-backends.onrender.com/product/${productId}`, {
           headers: { Authorization: `bearer ${token}` },
         });
         console.log("Fetched product details:", response.data); // Debug log
@@ -71,13 +71,13 @@ const UpdateProductForm = () => {
     try {
       console.log("Sending PUT request with data:", formData); // Debug log
       const response = await axios.put(
-        `http://localhost:7000/products/${productId}`,
+        `https://watchstore-backends.onrender.com/products/${productId}`,
         formData,
         {
           headers: { Authorization: `bearer ${token}` },
         }
       );
-      console.log("PUT URL:", `http://localhost:7000/products/${productId}`);
+      console.log("PUT URL:", `https://watchstore-backends.onrender.com/products/${productId}`);
       console.log("PUT response:", response.data); // Debug log
       if (response.status === 200) {
         setMessage("Product updated successfully!");

@@ -60,7 +60,7 @@ function AddProduct() {
     try {
       //submit formdata
       const response = await axios.post(
-        "http://localhost:7000/product", formData, {
+        "https://watchstore-backends.onrender.com/product", formData, {
         headers: {
           Authorization: `Bearer ${token}`
         },
