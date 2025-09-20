@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -30,8 +30,14 @@ function NavBar({ onProductSelect }) {
   const [isSecurity, setIsSecutrity] = useState(false);
   const toggleDropdown= () => setIsMegaMenuVisible(!isMegaMenuVisible);
   const toggleDropdown2= () => setIsSecutrity(!isSecurity);
-
-
+  
+  const navigate = useNavigate();
+  
+  const logout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/');
+  };
+  
   useEffect(() => {
     const fetchUserName = async () => {
       const token = localStorage.getItem('authToken');
@@ -198,7 +204,7 @@ function NavBar({ onProductSelect }) {
             <FontAwesomeIcon icon={faShop} /> Shop
           </li>
           {userName ? (
-            <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+            <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer" onClick={logout}>
               <FontAwesomeIcon icon={faSignOutAlt} /> {userName}
             </li>
           ) : (
