@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const config = require('./config/config.json'); 
-
+const config = require('./config/config.json'); // adjust path if needed
 dotenv.config();
 
 async function mongoConnect() {
@@ -12,10 +11,10 @@ async function mongoConnect() {
     const visibleUri = dbUrl.replace(/:\/\/.*@/, '://****:****@');
     console.log("Trying to connect to MongoDB:", visibleUri);
 
-    await mongoose.connect(dbUrl);
-    console.log(" Database connection established!");
+    await mongoose.connect(dbUrl); // no need for useNewUrlParser/useUnifiedTopology in Mongoose v6+
+    console.log("✅ Database connection established!");
   } catch (error) {
-    console.error("Database connection error:", error);
+    console.error("❌ Database connection error:", error);
     process.exit(1);
   }
 }
