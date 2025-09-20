@@ -206,7 +206,7 @@ function SingleProduct() {
           ))}
         </div>
       </div>
-    </div>
+   
   </>);
 }
 
