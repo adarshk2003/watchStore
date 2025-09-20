@@ -123,11 +123,12 @@ const SingleUser = () => {
                       key={product._id}
                       className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
                     >
-                      <img
-                        src={`${baseUrl}/${product.product_images[0]}`}
-                        alt={product.title}
-                        className="w-full h-56 object-cover rounded-md mb-6 transform hover:scale-105 transition-all duration-300 ease-in-out"
-                      />
+                   <img
+  src={product.product_images[0]} // full URL, no baseUrl
+  alt={product.title}
+  className="w-full h-56 object-cover rounded-md mb-6 transform hover:scale-105 transition-all duration-300 ease-in-out"
+/>
+
                       <h3 className="text-gray-800 text-xl font-semibold mb-2">{product.title}</h3>
                       <p className="text-gray-600 text-md mb-4">{product.brand}</p>
                       <div className="flex justify-between items-center">
