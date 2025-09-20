@@ -86,25 +86,43 @@ function NavSeller() {
           <FontAwesomeIcon icon={faBars} />
         </i>
 
-        <div className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${isMenuOpen ? "opacity-100" : "opacity-0"}`}
-          style={{ zIndex: 50, transition: "transform 0.3s ease, opacity 0.3s ease" }}>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faHome} /> Home
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faListAlt} /> My product
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faExplosion} /> Explore
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faShop} />Add product
-          </li>
-          <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-            <FontAwesomeIcon icon={faUser} /> Login
-          </li>
+       <div
+  className={`absolute md:hidden top-24 left-0 w-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
+    isMenuOpen ? "opacity-100" : "opacity-0"
+  }`}
+  style={{ zIndex: 50, transition: "transform 0.3s ease, opacity 0.3s ease" }}
+>
+  <Link to="/home" onClick={() => setIsMenuOpen(false)}>
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faHome} /> Home
+    </li>
+  </Link>
 
-        </div>
+  <Link to="/myproducts" onClick={() => setIsMenuOpen(false)}>
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faListAlt} /> My Products
+    </li>
+  </Link>
+
+  <Link to="/dashboard-seller" onClick={() => setIsMenuOpen(false)}>
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faExplosion} /> Explore
+    </li>
+  </Link>
+
+  <Link to="/addproduct" onClick={() => setIsMenuOpen(false)}>
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faShop} /> Add Product
+    </li>
+  </Link>
+
+  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
+      <FontAwesomeIcon icon={faUser} /> Login
+    </li>
+  </Link>
+</div>
+
       </div>
     </>
   );
