@@ -59,13 +59,14 @@ function SingleProductSeller() {
           />
           <div className="flex gap-2">
             {product.product_images?.map((img, index) => (
-              <img
-                key={index}
-                src={`${baseUrl}/${img}`}
-                alt={`Product ${index + 1}`}
-                className="w-24 h-24 object-cover rounded-md cursor-pointer border"
-                onClick={() => setMainImage(img)}
-              />
+         <img
+  key={index}
+  src={img}  // <-- use the full Cloudinary URL directly
+  alt={`Product ${index + 1}`}
+  className="w-24 h-24 object-cover rounded-md cursor-pointer border"
+  onClick={() => setMainImage(img)}
+/>
+
             ))}
           </div>
         </div>
