@@ -68,8 +68,8 @@ exports.getOutOfStockEmailContent = (sellerName, productTitle) => {
           <p>Thank you for being a valued seller on our platform. If you need assistance, please don't hesitate to contact us.</p>
         </div>
         <div class="email-footer">
-          <p>&copy; ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
-          <p><a href="https://yourwebsite.com">Visit our website</a> | <a href="mailto:support@yourcompany.com">Contact Support</a></p>
+          <p>&copy; ${new Date().getFullYear()} clyro. All rights reserved.</p>
+          <p><a href="https://yourwebsite.com">Visit our website</a> | <a href="mailto:support@clyro.com">Contact Support</a></p>
         </div>
       </div>
     </body>
