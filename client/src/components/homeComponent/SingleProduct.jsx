@@ -112,28 +112,26 @@ function SingleProduct() {
   return (
   <>
   <NavBaruser/>
-    <div className="flex flex-col gap-8 p-6">
-      {/* Product Images and Features */}
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Images */}
-        <div className="flex flex-col w-full lg:w-1/2 gap-4">
-          <img
-            src={`${baseUrl}/${mainImage}`}
-            alt={product.title}
-            className="w-full h-auto object-cover rounded-lg shadow-lg"
-          />
-          <div className="flex gap-2">
-            {product.product_images?.map((img, index) => (
-              <img
-                key={index}
-                src={`${baseUrl}/${img}`}
-                alt={`Product ${index + 1}`}
-                className="w-24 h-24 object-cover rounded-md cursor-pointer border"
-                onClick={() => setMainImage(img)}
-              />
-            ))}
-          </div>
-        </div>
+   <div className="flex flex-col lg:flex-row gap-8">
+  {/* Images */}
+  <div className="flex flex-col w-full lg:w-1/2 gap-4">
+    <img
+      src={mainImage} // Use the URL directly
+      alt={product.title}
+      className="w-full h-auto object-cover rounded-lg shadow-lg"
+    />
+    <div className="flex gap-2">
+      {product.product_images?.map((img, index) => (
+        <img
+          key={index}
+          src={img} // Direct Cloudinary URL
+          alt={`Product ${index + 1}`}
+          className="w-24 h-24 object-cover rounded-md cursor-pointer border"
+          onClick={() => setMainImage(img)}
+        />
+      ))}
+    </div>
+  </div>
 
         {/* Features and Actions */}
         <div className="flex flex-col w-full lg:w-1/2 gap-6">
@@ -188,18 +186,18 @@ function SingleProduct() {
       {/* Similar Products */}
       <div>
         <h2 className="text-2xl font-bold">Similar Products</h2>
-        <div className="flex flex-wrap gap-4">
-          {similarProducts.map((product) => (
-            <div
-              key={product._id}
-              onClick={() => navigate(`/product/${product._id}`)}
-              className="p-4 border rounded-lg cursor-pointer"
-            >
-              <img
-                src={`${baseUrl}/${product.product_images[0]}`}
-                alt={product.title}
-                className="w-full h-32 object-cover object-center"
-              />
+<div className="flex flex-wrap gap-4">
+  {similarProducts.map((product) => (
+    <div
+      key={product._id}
+      onClick={() => navigate(`/product/${product._id}`)}
+      className="p-4 border rounded-lg cursor-pointer"
+    >
+      <img
+        src={product.product_images[0]} // Use the URL directly
+        alt={product.title}
+        className="w-full h-32 object-cover object-center"
+      />
 <h3>
   {product.title.length > 30 ? product.title.slice(0, 30) + '...' : product.title}
 </h3>
