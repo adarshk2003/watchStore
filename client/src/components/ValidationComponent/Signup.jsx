@@ -60,7 +60,7 @@ function SignUp({ setUserName }) {
 
     // Fetching
     try {
-      const response = await axios.post("http://localhost:7000/users", data, {
+      const response = await axios.post("https://watchstore-backends.onrender.com/users", data, {
           headers: {
               'Content-Type': 'application/json'
           }
