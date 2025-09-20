@@ -61,7 +61,7 @@ function NavSellerCom() {
         </i>
 
        <div
-  className={`fixed md:hidden top-0 left-0 w-full h-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
+  className={`absolute md:hidden top-0 left-0 w-full h-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
     isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
   }`}
   style={{ zIndex: 50, transition: "transform 0.3s ease, opacity 0.3s ease" }}
