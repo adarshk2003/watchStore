@@ -106,17 +106,17 @@ export default function MyProducts() {
               className={`bg-white shadow-md rounded-lg overflow-hidden transition-transform transform ${product.isStatus ? '' : 'hover:scale-105'
                 }`}
             >
-           <img
+  <img
   src={
     product.product_images && product.product_images.length > 0
-      ? `${baseUrl}/${product.product_images[0]}`
+      ? product.product_images[0]  // <-- use the full URL directly
       : '/images/default-image.png'
   }
-                alt={product.title}
-                className={`w-full h-40 object-cover ${product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'
-                  }`}
-                onClick={() => !product.isStatus && navigate(`/products/${product._id}`)}
-              />
+  alt={product.title}
+  className={`w-full h-40 object-cover ${product.isStatus ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'}`}
+  onClick={() => !product.isStatus && navigate(`/products/${product._id}`)}
+/>
+
               <div className="p-4">
                 <h4 className="text-lg font-bold capitalize line-clamp-2">{truncateTitle(product.title, 25)}</h4>
                 <p className="text-gray-900 font-semibold mt-2">₹ {product.price}</p>
