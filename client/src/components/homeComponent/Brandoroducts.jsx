@@ -55,10 +55,11 @@ const BrandProducts = () => {
       <h2 className="text-2xl font-bold mb-4">{brandName} Products</h2>
       <div className="grid grid-cols-3 gap-4">
         {products.map((product) => {
-          const imageUrl =
-            product.product_images && product.product_images.length > 0
-              ? `https://watchstore-backends.onrender.com/${product.product_images[0]}`
-              : 'https://via.placeholder.com/150';
+         const imageUrl =
+  product.product_images && product.product_images.length > 0
+    ? product.product_images[0]  // use the full Cloudinary URL directly
+    : 'https://via.placeholder.com/150';
+
 
           return (
             <div key={product._id} className="p-4 border rounded-md">
