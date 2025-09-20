@@ -32,7 +32,7 @@ function LoginForm() {
     }
 
     try {
-      const response = await axios.post('http://localhost:7000/login', { email, password });
+      const response = await axios.post('https://watchstore-backends.onrender.com/login', { email, password });
 
       const { token, user_type, isBlocked } = response.data.data;
 
