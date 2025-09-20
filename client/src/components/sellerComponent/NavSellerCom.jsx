@@ -34,7 +34,8 @@ function NavSellerCom() {
 
   return (
     <>
-      <div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm">
+<div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm z-50 fixed top-0 left-0">
+
         <Link to='/seller-home'>
           <h1 className="hover:scale-105 transition-all font-russo-one text-2xl hover:text-emerald-800">CLYRO</h1>
         </Link>
