@@ -6,6 +6,10 @@ import ProfileDropdownAdmin from './ProfileDropdownAdmin';
 import NotificationPage from './Notifications';
 function NavAdminCommon() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const logout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/');
+  };
   return (
    <>
   <div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm">
