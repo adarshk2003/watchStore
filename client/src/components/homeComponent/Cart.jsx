@@ -163,18 +163,17 @@ export default function Cart() {
                       className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md border border-gray-200"
                     >
                       <div className="flex items-center gap-4">
-                        <img
-                          onClick={() =>
-                            product && navigate(`/product/${product._id}`)
-                          }
-                          src={
-                            product?.product_images?.length > 0
-                              ? `https://watchstore-backends.onrender.com/${product.product_images[0]}`
-                              : "/Omega.jpeg"
-                          }
-                          alt={product?.title || "Product Image"}
-                          className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:opacity-80"
-                        />
+                   <img
+  onClick={() => product && navigate(`/product/${product._id}`)}
+  src={
+    product?.product_images?.length > 0
+      ? product.product_images[0] // use directly if Cloudinary
+      : "/Omega.jpeg"
+  }
+  alt={product?.title || "Product Image"}
+  className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:opacity-80"
+/>
+
                         <div>
                           <h2 className="text-lg font-semibold capitalize">
                             {product?.title || "Product not available"}
