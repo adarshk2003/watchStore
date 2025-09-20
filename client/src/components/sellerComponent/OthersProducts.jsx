@@ -105,12 +105,12 @@ export default function OthersProductList() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {Array.isArray(productsToDisplay) && productsToDisplay.map((product) => (
           <div key={product._id} className="bg-white shadow-md rounded-lg overflow-hidden transition-transform transform hover:scale-105">
-            <img
-              src={
-                product.product_images && product.product_images.length > 0
-                  ? `${baseUrl}/${product.product_images[1]}`
-                  : './public/images/default-image.png' // Fallback to a default image
-              }
+           <img
+  src={
+    product.product_images && product.product_images.length > 0
+      ? `${baseUrl}/${product.product_images[0]}`
+      : '/images/default-image.png' // starts from public folder root
+  }
               alt={product.title}
               className="w-full h-40 object-cover hover:cursor-pointer"
               onClick={() => navigate(`/products/${product._id}`)}
