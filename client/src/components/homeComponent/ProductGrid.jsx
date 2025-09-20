@@ -269,9 +269,11 @@ function ProductGrid({ selectedProducts }) {
               const isInCart = cartItems.includes(product._id);
               const isInWishlist = wishlistItems.includes(product._id);
 
-              const imageUrl = product.product_images && product.product_images.length > 0
-                ? `${baseUrl}/${product.product_images[0]}`
-                : "/public/rolex.jpg"; // Fallback image
+              const imageUrl =
+  product.product_images && product.product_images.length > 0
+    ? product.product_images[0] // Already a full Cloudinary URL
+    : "/public/rolex.jpg"; // Fallback image
+
 
               return (
                 <div
@@ -352,9 +354,11 @@ function ProductGrid({ selectedProducts }) {
           const isInCart = cartItems.includes(product._id);
           const isInWishlist = wishlistItems.includes(product._id);
 
-          const imageUrl = product.product_images && product.product_images.length > 0
-            ? `${baseUrl}/${product.product_images[0]}`
-            : "/public/rolex.jpg"; // Fallback image
+          const imageUrl =
+  product.product_images && product.product_images.length > 0
+    ? product.product_images[0] // Already a full Cloudinary URL
+    : "/public/rolex.jpg"; // Fallback image
+
 
           return (
             <div
