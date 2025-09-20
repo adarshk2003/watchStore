@@ -92,7 +92,7 @@ export default function MyProducts() {
   };
   return (<>
     <NavSellerCom />
-    <div className="container-fluid w-full">
+    <div className="container-fluid w-full pt-24">
       <div className="container mx-auto my-8 px-4">
         <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">My Products</h3>
 
