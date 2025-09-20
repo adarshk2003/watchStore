@@ -105,11 +105,12 @@ function SingleProductSeller() {
               onClick={() => navigate(`/products/${product._id}`)}
               className="p-4 border rounded-lg cursor-pointer"
             >
-              <img
-                src={`${baseUrl}/${product.product_images[0]}`}
-                alt={product.title}
-                className="w-60 h-32 object-cover"
-              />
+           <img
+  src={product.product_images[0]}  // <-- full URL, no baseUrl needed
+  alt={product.title}
+  className="w-60 h-32 object-cover"
+/>
+
             <h3>
   {product.title.length > 30 ? `${product.title.substring(0, 30)}...` : product.title}
 </h3>
