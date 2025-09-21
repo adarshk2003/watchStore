@@ -27,11 +27,11 @@ function Carousel() {
     const goToSlide=(slideIndex)=>{
         setCurrentIndex(slideIndex);
     }
-    // useEffect(() => {
-    //     const interval = setInterval(() => { 
-    //         nextSlide(); }, 7000);
-    //          return () => clearInterval(interval); 
-    //         }, [currentIndex]);
+     useEffect(() => {
+        const interval = setInterval(() => { 
+             nextSlide(); }, 7000);
+             return () => clearInterval(interval); 
+            }, [currentIndex]);
 
 
     return (
