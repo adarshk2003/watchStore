@@ -50,7 +50,7 @@ exports.upgradeApprovalNotification = function (userName, companyName) {
                     <p>Dear ${userName},</p>
                     <p>We are excited to inform you that your upgrade request to become a seller for your company "<strong>${companyName}</strong>" has been approved.</p>
                     <p>You can now access your seller dashboard and start managing your products and sales.</p>
-                    <a href="http://localhost:5173/Signin" class="btn">Go to Seller Dashboard</a>
+                    <a href="https://watchstore-frontent.onrender.com/login" class="btn">Go to Seller Dashboard</a>
                     <p>Thank you for choosing our platform to grow your business. If you have any questions, feel free to contact our support team.</p>
                     <p>Best regards,</p>
                     <p>The Team</p>
