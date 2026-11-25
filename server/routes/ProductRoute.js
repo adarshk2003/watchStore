@@ -16,6 +16,9 @@ router.get('/products', setAccessControl('*'), productController.viewProducts);
 
 router.get('/product/:id', setAccessControl('*'), productController.viewSingleProduct);
 
+router.get('/products/mine', setAccessControl('3'), productController.getMyProducts);
+router.get('/products/others', setAccessControl('3'), productController.getOtherProducts);
+
 router.get('/products/user/:id', productController.viewProductsByUser);
 
 router.delete('/product/:productId',setAccessControl('1,3'), productController.deleteProduct);

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaGlobe } from 'react-icons/fa'; 
 import Flag from 'react-world-flags';
+import PropTypes from 'prop-types';
 
-const LanguageToggle = ({ currentLanguage, onLanguageChange }) => {
+const LanguageToggle = ({ onLanguageChange }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -60,6 +61,10 @@ const LanguageToggle = ({ currentLanguage, onLanguageChange }) => {
       )}
     </div>
   );
+};
+
+LanguageToggle.propTypes = {
+  onLanguageChange: PropTypes.func.isRequired,
 };
 
 export default LanguageToggle;

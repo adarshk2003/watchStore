@@ -8,4 +8,6 @@ const review = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+review.index({ productId: 1 });
+
 module.exports = mongoose.model('Review', review);

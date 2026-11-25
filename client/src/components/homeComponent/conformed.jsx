@@ -1,68 +1,43 @@
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom';
+import { FaCheck, FaClock, FaShoppingBag } from 'react-icons/fa';
+import NavBaruser from '../navComponent/userNav';
 
 export default function OrderConfirmation() {
-  const navigate = useNavigate();
+  const { state } = useLocation();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-100 to-green-100">
-      <motion.div
-        className="bg-white shadow-2xl rounded-lg p-8 w-full max-w-md"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Popping 🎉 */}
-        <motion.div
-          className="text-center mb-6"
-          initial={{ scale: 0 }}
-          animate={{ scale: [0, 1.5, 1] }}
-          transition={{ duration: 0.6, type: "spring" }}
-        >
-          <span className="text-6xl">🎉</span>
-        </motion.div>
-
-        {/* Heading */}
-        <motion.h1
-          className="text-3xl font-bold text-green-600 mb-4 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-        >
-          Order Confirmed!
-        </motion.h1>
-
-        {/* Description */}
-        <motion.p
-          className="text-lg text-gray-700 text-center mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
-          Thank you for your purchase. Your order is being processed and will be shipped soon.
-        </motion.p>
-
-        {/* Buttons */}
-        <motion.div
-          className="flex justify-between"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.7 }}
-        >
-          <button
-            className="bg-blue-500 text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-600 shadow-md transform hover:scale-105 transition duration-300"
-            onClick={() => navigate("/orders")}
-          >
-            Go to Orders
-          </button>
-          <button
-            className="bg-gray-500 text-white py-2 px-6 rounded-lg font-medium hover:bg-gray-600 shadow-md transform hover:scale-105 transition duration-300"
-            onClick={() => navigate("/home")}
-          >
-            Home
-          </button>
-        </motion.div>
-      </motion.div>
-    </div>
+    <>
+      <NavBaruser />
+      <main className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-[#f7f6f2] px-4 py-12 sm:px-8">
+        <section className="w-full max-w-xl rounded-3xl border border-stone-200 bg-white p-7 text-center shadow-sm sm:p-10">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
+            <FaCheck aria-hidden="true" size={26} />
+          </div>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-900">Order received</p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold text-stone-950 sm:text-4xl">Thank you for choosing Clyro</h1>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-stone-600">
+            Your order has been placed. You can follow its progress and review delivery details in your order history.
+          </p>
+          {state?.orderId && (
+            <div className="mt-6 rounded-xl bg-[#f7f6f2] px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Order reference</p>
+              <p className="mt-1 font-mono text-sm font-semibold text-stone-900">#{String(state.orderId).slice(-10).toUpperCase()}</p>
+            </div>
+          )}
+          <div className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-600">
+            <FaClock aria-hidden="true" className="text-emerald-900" />
+            Payment is due on delivery (cash on delivery).
+          </div>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link to="/orders" className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+              View my orders
+            </Link>
+            <Link to="/shop" className="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-emerald-900 hover:text-emerald-950">
+              <FaShoppingBag aria-hidden="true" /> Continue shopping
+            </Link>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }

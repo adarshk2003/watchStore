@@ -1,104 +1,117 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBars, faHome, faExplosion, faUser, faShop, faListAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBars,
+  faBox,
+  faChartLine,
+  faHouse,
+  faPlus,
+  faSignOutAlt,
+  faTimes,
+  faUser,
+} from '@fortawesome/free-solid-svg-icons';
 import ProfileDropdownseller from './ProfileDropdownseller';
-import axios from 'axios';
+
+const sellerLinks = [
+  { to: '/seller-home', label: 'Storefront', icon: faHouse, end: true },
+  { to: '/myproducts', label: 'My products', icon: faBox },
+  { to: '/dashboard-seller', label: 'Sales overview', icon: faChartLine },
+  { to: '/addproduct', label: 'Add a watch', icon: faPlus },
+];
+
+const linkClass = ({ isActive }) =>
+  `rounded-full px-4 py-2 text-sm font-medium transition ${
+    isActive
+      ? 'bg-emerald-50 text-emerald-950'
+      : 'text-stone-600 hover:bg-stone-100 hover:text-emerald-950'
+  }`;
+
 function NavSellerCom() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userName, setUserName] = useState('');
-  useEffect(() => {
-    const fetchUserName = async () => {
-      const token = localStorage.getItem('authToken');
-      const userId = localStorage.getItem('userId');
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-      try {
-        const response = await axios.get(`https://watchstore-backends.onrender.com/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const userData = response.data.data[0];
-        const { name } = userData;
-        setUserName(name);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+  const navigate = useNavigate();
 
-    fetchUserName();
-  }, []);
+  const logout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userType');
+    setIsMenuOpen(false);
+    navigate('/login', { replace: true });
+  };
 
   return (
-    <>
-<div className="flex justify-between w-full backdrop-blur-md py-3 px-8 md:px-32 items-center text-black shadow-sm z-50 fixed top-0 left-0">
-
-        <Link to='/seller-home'>
-          <h1 className="hover:scale-105 transition-all font-russo-one text-2xl hover:text-emerald-800">CLYRO</h1>
+    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#fbfaf7]/95 text-stone-900 shadow-sm backdrop-blur-xl">
+      <nav aria-label="Seller navigation" className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
+        <Link to="/seller-home" className="group flex shrink-0 items-center gap-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-950 font-serif text-lg font-bold text-white transition group-hover:bg-emerald-800">C</span>
+          <span className="font-serif text-xl font-bold tracking-[0.18em] text-emerald-950">CLYRO</span>
+          <span className="ml-1 hidden rounded-full bg-[#f1eee7] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-stone-600 sm:inline">Seller</span>
         </Link>
-        <ul className="hidden md:flex items-center gap-10 font-semibold text-base">
-          <Link to='/seller-home'><li className="hover:underline hover:text-emerald-800 cursor-pointer">home</li></Link>
-          <Link to='/myproducts'><li className="hover:underline hover:text-emerald-800 cursor-pointer ">My products</li></Link>
-           <Link to='/dashboard-seller'><li className="hover:underline hover:text-emerald-800 cursor-pointer">explore</li></Link>
-          <Link to='/addproduct'><li className="hover:underline hover:text-emerald-800 cursor-pointer">Add product</li></Link>
-        </ul>
-        <div className="flex items-center justify-center">
-          {/* <Link to='/wishlist'><li className="list-none m-2 cursor-pointer">
-            <FontAwesomeIcon icon={faHeart} />
-          </li></Link>
-          <Link to='/cart'><li className="list-none m-2 cursor-pointer">
-            <FontAwesomeIcon icon={faBagShopping} />
-          </li></Link> */}
-          <li className="hidden lg:block list-none m-2 cursor-pointer">
-            <ProfileDropdownseller />
-          </li>
+
+        <div className="hidden items-center gap-1 lg:flex">
+          {sellerLinks.map(({ to, label, end }) => (
+            <NavLink key={to} to={to} end={end} className={linkClass}>{label}</NavLink>
+          ))}
         </div>
-        <i className="md:hidden block text-3xl cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <FontAwesomeIcon icon={faBars} />
-        </i>
 
-       <div
-  className={`absolute md:hidden top-0 left-0 w-full h-full bg-black flex flex-col items-center gap-6 font-semibold text-lg transform transition-transform ${
-    isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
-  }`}
-  style={{ zIndex: 50, transition: "transform 0.3s ease, opacity 0.3s ease" }}
->
-  <Link to="/home" onClick={() => setIsMenuOpen(false)}>
-    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-      <FontAwesomeIcon icon={faHome} /> Home
-    </li>
-  </Link>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:block"><ProfileDropdownseller /></div>
+          <button
+            type="button"
+            aria-label={isMenuOpen ? 'Close seller menu' : 'Open seller menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="seller-mobile-menu"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-stone-700 transition hover:bg-stone-100 lg:hidden"
+          >
+            <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
+          </button>
+        </div>
+      </nav>
 
-  <Link to="/myproducts" onClick={() => setIsMenuOpen(false)}>
-    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-      <FontAwesomeIcon icon={faListAlt} /> My Products
-    </li>
-  </Link>
-
-  <Link to="/dashboard-seller" onClick={() => setIsMenuOpen(false)}>
-    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-      <FontAwesomeIcon icon={faExplosion} /> Explore
-    </li>
-  </Link>
-
-  <Link to="/addproduct" onClick={() => setIsMenuOpen(false)}>
-    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-      <FontAwesomeIcon icon={faShop} /> Add Product
-    </li>
-  </Link>
-
-  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-    <li className="list-none w-full text-center p-4 hover:bg-emerald-900 text-white transition-all cursor-pointer">
-      <FontAwesomeIcon icon={faUser} /> Login
-    </li>
-  </Link>
-</div>
-
-      </div>
-    </>
+      {isMenuOpen && (
+        <div id="seller-mobile-menu" className="border-t border-stone-200 bg-[#fbfaf7] px-4 pb-5 pt-3 shadow-lg lg:hidden">
+          <div className="mx-auto grid max-w-7xl gap-1">
+            {sellerLinks.map(({ to, label, icon, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                onClick={() => setIsMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    isActive ? 'bg-emerald-50 text-emerald-950' : 'text-stone-700 hover:bg-stone-100'
+                  }`
+                }
+              >
+                <FontAwesomeIcon icon={icon} className="w-4" /> {label}
+              </NavLink>
+            ))}
+            <Link
+              to="/profile"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
+            >
+              <FontAwesomeIcon icon={faUser} className="w-4" /> My profile
+            </Link>
+            <Link
+              to="/settings"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
+            >
+              <span className="w-4" /> Account settings
+            </Link>
+            <button
+              type="button"
+              onClick={logout}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} className="w-4" /> Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }
 

@@ -1,99 +1,111 @@
-import React, { useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { useState } from 'react';
+import { FaArrowRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const brands = [
-  { id: 1, name: "Rolex", img: "/icons/rolex.webp" },
-  { id: 2, name: "Patek Philippe", img: "/icons/patric.webp" },
-  { id: 3, name: "Audemars Piguet", img: "/icons/piquit.webp" },
-  { id: 4, name: "Panerai", img: "/icons/paneri.webp" },
-  { id: 5, name: "Omega", img: "/icons/omega.webp" },
-  { id: 6, name: "Cronoswiss", img: "/icons/cronoswiss.webp" },
-  { id: 7, name: "Jaeger-LeCoultre", img: "/icons/jaeger.webp" },
-  { id: 8, name: "Blancpain", img: "/icons/blancpain.webp" },
-  { id: 9, name: "IWC Schaffhausen", img: "/icons/iwc.webp" },
-  { id: 10, name: "Tag Heuer", img: "/icons/tag.webp" },
-  { id: 11, name: "Hublot", img: "/icons/hublot.webp" },
-  { id: 12, name: "Mauric Lacroix", img: "/icons/mauric.webp" },
-  { id: 13, name: "Cartier", img: "/icons/cartier.webp" },
-  { id: 14, name: "Breitling", img: "/icons/berlting.webp" },
-  { id: 15, name: "Zenith", img: "/icons/zenth.webp" },
-  { id: 16, name: "Girard-Perregaux", img: "/icons/gp.webp" },
-  { id: 17, name: "Ranck Muller", img: "/icons/muller.webp" },
-  { id: 18, name: "A. Lange & Söhne", img: "/icons/sohene.webp" },
-  { id: 19, name: "Chopard", img: "/icons/chopard.webp" },
-  { id: 20, name: "Longines", img: "/icons/longines.webp" },
+  { name: 'Rolex', image: '/icons/rolex.webp' },
+  { name: 'Patek Philippe', image: '/icons/patric.webp' },
+  { name: 'Audemars Piguet', image: '/icons/piquit.webp' },
+  { name: 'Panerai', image: '/icons/paneri.webp' },
+  { name: 'Omega', image: '/icons/omega.webp' },
+  { name: 'Cronoswiss', image: '/icons/cronoswiss.webp' },
+  { name: 'Jaeger-LeCoultre', image: '/icons/jaeger.webp' },
+  { name: 'Blancpain', image: '/icons/blancpain.webp' },
+  { name: 'IWC Schaffhausen', image: '/icons/iwc.webp' },
+  { name: 'TAG Heuer', image: '/icons/tag.webp' },
+  { name: 'Hublot', image: '/icons/hublot.webp' },
+  { name: 'Mauric Lacroix', image: '/icons/mauric.webp' },
+  { name: 'Cartier', image: '/icons/cartier.webp' },
+  { name: 'Breitling', image: '/icons/berlting.webp' },
+  { name: 'Zenith', image: '/icons/zenth.webp' },
+  { name: 'Girard-Perregaux', image: '/icons/gp.webp' },
+  { name: 'Ranck Muller', image: '/icons/muller.webp' },
+  { name: 'A. Lange & Söhne', image: '/icons/sohene.webp' },
+  { name: 'Chopard', image: '/icons/chopard.webp' },
+  { name: 'Longines', image: '/icons/longines.webp' },
 ];
 
-const PopularBrands = () => {
+const brandsPerPage = 5;
+
+export default function PopularBrands() {
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5;
-  const maxPage = Math.ceil(brands.length / itemsPerPage) - 1;
-
-  const nextPage = () => {
-    if (currentPage < maxPage) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
+  const pageCount = Math.ceil(brands.length / brandsPerPage);
   const displayedBrands = brands.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
+    currentPage * brandsPerPage,
+    (currentPage + 1) * brandsPerPage
   );
 
+  const previousPage = () => setCurrentPage((page) => Math.max(0, page - 1));
+  const nextPage = () => setCurrentPage((page) => Math.min(pageCount - 1, page + 1));
+
   return (
-    <div className="relative w-full">
-      <h2 className="text-xl font-bold mb-4 text-center bg-zinc-950/10 rounded-2xl">Popular Brands</h2>
-      <div className="flex items-center justify-between">
-        {/* Left Arrow */}
+    <div className="mx-auto max-w-7xl">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-900">Explore the names</p>
+          <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-stone-950 sm:text-4xl">Browse by brand</h2>
+        </div>
+        <Link to="/shop" className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-emerald-950 transition hover:text-emerald-700">
+          View all watches <FaArrowRight aria-hidden="true" size={12} />
+        </Link>
+      </div>
+
+      <div className="mt-7 flex items-center gap-3 sm:gap-5">
         <button
-          onClick={prevPage}
+          type="button"
+          onClick={previousPage}
           disabled={currentPage === 0}
-          className={`${
-            currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
-          } bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300`}
+          aria-label="Previous brands"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-emerald-900 hover:text-emerald-950 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <FaChevronLeft size={20} />
+          <FaChevronLeft aria-hidden="true" size={12} />
         </button>
 
-        {/* Brands Grid */}
-        <div className="grid grid-cols-5 grid-rows-1 gap-4 w-full max-w-4xl mx-auto">
+        <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
           {displayedBrands.map((brand) => (
-            <div
-              key={brand.id}
-              className="flex flex-col items-center p-2 bg-white rounded-lg shadow hover:shadow-md cursor-pointer"
+            <Link
+              key={brand.name}
+              to={`/category/${encodeURIComponent(brand.name)}`}
+              className="group flex min-h-36 flex-col items-center justify-center rounded-2xl border border-stone-200 bg-[#fbfaf7] p-4 text-center transition hover:-translate-y-1 hover:border-emerald-900/30 hover:bg-white hover:shadow-md sm:min-h-40"
             >
-              <Link to={`/category/${brand.name.toLowerCase()}`}>
+              <span className="flex h-16 w-full items-center justify-center">
                 <img
-                  src={brand.img}
-                  alt={brand.name}
-                  className="w-full h-auto object-cover rounded-md"
+                  src={brand.image}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-14 max-w-[85%] object-contain grayscale transition group-hover:grayscale-0"
                 />
-                <p className="text-sm font-medium mt-2">{brand.name}</p>
-              </Link>
-            </div>
+              </span>
+              <span className="mt-3 line-clamp-1 text-xs font-semibold text-stone-700 transition group-hover:text-emerald-950 sm:text-sm">
+                {brand.name}
+              </span>
+            </Link>
           ))}
         </div>
 
-        {/* Right Arrow */}
         <button
+          type="button"
           onClick={nextPage}
-          disabled={currentPage === maxPage}
-          className={`${
-            currentPage === maxPage ? "opacity-50 cursor-not-allowed" : ""
-          } bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300`}
+          disabled={currentPage === pageCount - 1}
+          aria-label="Next brands"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:border-emerald-900 hover:text-emerald-950 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <FaChevronRight size={20} />
+          <FaChevronRight aria-hidden="true" size={12} />
         </button>
+      </div>
+
+      <div className="mt-5 flex justify-center gap-2" aria-label="Brand pages">
+        {Array.from({ length: pageCount }, (_, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => setCurrentPage(index)}
+            aria-label={`Show brand page ${index + 1}`}
+            aria-current={currentPage === index ? 'true' : undefined}
+            className={`h-1.5 rounded-full transition-all ${currentPage === index ? 'w-7 bg-emerald-950' : 'w-1.5 bg-stone-300 hover:bg-stone-500'}`}
+          />
+        ))}
       </div>
     </div>
   );
-};
-
-export default PopularBrands;
+}

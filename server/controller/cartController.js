@@ -7,8 +7,7 @@ const error_function = require('../utils/response-handler').error_function;
 
 // Authentication middleware
 const authenticate = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer', '').trim();
-  console.log("token", token);
+  const token = req.header('Authorization')?.replace(/^Bearer\s+/i, '').trim();
 
   if (!token) {
     return res.status(401).json({ message: "No token.. please login" });
@@ -17,7 +16,6 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
     req.user = { id: decoded.user_id };
-    console.log("Decoded user ID:", req.user.id);
     next();
   } catch (error) {
     return res.status(401).send({ message: 'Invalid or expired token.' });
@@ -62,7 +60,9 @@ exports.getCart = [
   async (req, res) => {
     try {
       const userId = req.user.id;
-      const cart = await Cart.findOne({ userId }).populate('items.productId'); // Populate product info
+      const cart = await Cart.findOne({ userId })
+        .populate('items.productId', 'title brand price stock product_images isStatus')
+        .lean();
 
       if (!cart || cart.items.length === 0) {
         return res.status(200).json({ message: 'Cart is empty', items: [] });

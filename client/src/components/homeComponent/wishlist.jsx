@@ -1,188 +1,283 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faHeart } from "@fortawesome/free-solid-svg-icons";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { addToCart } from "./cartUtil";
+import { API_BASE_URL } from '../../config/api.js';
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaArrowRight, FaHeart, FaRegClock, FaShoppingBag, FaTrash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import NavBaruser from '../navComponent/userNav';
+import { addToCart } from './cartUtil';
 
-import NavBaruser from "../navComponent/userNav";
+const formatPrice = (price) => `₹${Number(price || 0).toLocaleString('en-IN')}`;
 
-const Wishlist = () => {
-  const [cartItems, setCartItems] = useState([]);
+export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
-  const [error, setError] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const token = localStorage.getItem("authToken");
+  const [error, setError] = useState('');
+  const [cartError, setCartError] = useState(false);
+  const [processingIds, setProcessingIds] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
-  const baseUrl = "https://watchstore-backends.onrender.com";
+  const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await fetchCartItems();
-      } catch (err) {
-        setError(err.message || "Something went wrong");
-      } finally {
+    let active = true;
+
+    const fetchWishlistAndCart = async () => {
+      if (!token) {
         setLoading(false);
+        return;
       }
+
+      setLoading(true);
+      setError('');
+      setCartError(false);
+
+      const [wishlistResult, cartResult] = await Promise.allSettled([
+        axios.get(`${API_BASE_URL}/viewWishlist`, {
+          headers: { Authorization: `bearer ${token}` },
+        }),
+        axios.get(`${API_BASE_URL}/viewCart`, {
+          headers: { Authorization: `bearer ${token}` },
+        }),
+      ]);
+
+      if (!active) return;
+
+      if (wishlistResult.status === 'fulfilled') {
+        const items = wishlistResult.value.data?.items;
+        setWishlist(Array.isArray(items) ? items.filter((item) => item?.productId) : []);
+      } else {
+        console.error('Could not load wishlist:', wishlistResult.reason);
+        setError(
+          wishlistResult.reason.response?.data?.message ||
+            'We could not load your wishlist. Please try again.'
+        );
+      }
+
+      if (cartResult.status === 'fulfilled') {
+        const items = cartResult.value.data?.items;
+        setCartItems(
+          Array.isArray(items)
+            ? items.map((item) => item?.productId?._id || item?.productId).filter(Boolean)
+            : []
+        );
+      } else {
+        console.error('Could not check shopping bag items:', cartResult.reason);
+        setCartError(true);
+      }
+
+      setLoading(false);
     };
 
-    if (token) {
-      fetchData();
-    } else {
-      console.log("No token found.");
-    }
-  }, [token]);
+    fetchWishlistAndCart();
+    return () => {
+      active = false;
+    };
+  }, [token, refreshKey]);
 
-  const fetchCartItems = async () => {
-    if (!token) {
-      const localCart = JSON.parse(localStorage.getItem("cartItems")) || [];
-      setCartItems(localCart);
-      return;
-    }
+  const markProcessing = useCallback((productId, processing) => {
+    setProcessingIds((current) => (
+      processing
+        ? [...new Set([...current, productId])]
+        : current.filter((id) => id !== productId)
+    ));
+  }, []);
 
+  const handleRemove = async (productId) => {
+    markProcessing(productId, true);
     try {
-      const response = await axios.get(`${baseUrl}/viewCart`, {
-        headers: { Authorization: `Bearer ${token}` },
+      await axios.delete(`${API_BASE_URL}/deleteWishlist/${productId}`, {
+        headers: { Authorization: `bearer ${token}` },
       });
-      const cartProductIds = response.data.items.map((item) => item.productId._id);
-      setCartItems(cartProductIds);
-      localStorage.setItem("cartItems", JSON.stringify(cartProductIds));
-    } catch (err) {
-      console.error("Error fetching cart items:", err);
+      setWishlist((current) => current.filter((item) => item.productId?._id !== productId));
+      toast.success('Removed from your wishlist.');
+    } catch (requestError) {
+      console.error('Could not remove wishlist item:', requestError);
+      toast.error(requestError.response?.data?.message || 'Could not remove this item. Please try again.');
+    } finally {
+      markProcessing(productId, false);
     }
   };
 
   const handleAddToCart = async (productId) => {
     if (!token) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
 
-    const { success } = await addToCart(productId, setCartItems);
-    if (success) {
-      const updatedCart = [...cartItems, productId];
-      setCartItems(updatedCart);
-      localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-    }
-  };
-
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      if (!token) {
-        toast.error("Please log in to view your wishlist");
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${baseUrl}/viewWishlist`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setWishlist(response.data.items);
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to fetch wishlist");
-      }
-    };
-
-    fetchWishlist();
-  }, [token]);
-
-  const handleRemoveFromWishlist = async (productId) => {
+    markProcessing(productId, true);
     try {
-      await axios.delete(`${baseUrl}/deleteWishlist/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setWishlist(wishlist.filter((item) => item.productId._id !== productId));
-      toast.success("Product removed from wishlist");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to remove product from wishlist");
+      const result = await addToCart(productId);
+      if (result?.success) {
+        setCartItems((current) => current.includes(productId) ? current : [...current, productId]);
+      }
+    } finally {
+      markProcessing(productId, false);
     }
   };
 
-  const navigateToProductDetails = (productId) => {
-    navigate(`/product/${productId}`);
-  };
+  const productItems = wishlist.filter((item) => item?.productId?._id);
 
   return (
     <>
       <NavBaruser />
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">My Wishlist</h1>
-        {wishlist.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {wishlist.map((item) => (
-              <div
-                key={item.productId._id}
-                className="border relative rounded-lg shadow-md p-4 flex flex-col"
-              >
-               <img
-  onClick={() => navigateToProductDetails(item.productId._id)}
-  src={item.productId.product_images[0] || 'https://via.placeholder.com/150'}
-  alt={item.productId.title}
-  className="w-full h-48 object-cover mb-4 hover:cursor-pointer"
-/>
-
-                <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                  {item.productId.title}
-                </h2>
-                <p className="text-gray-600 text-sm mt-2">₹{item.productId.price}</p>
-                <div className="mt-2 flex justify-between items-center">
-                  {item.productId.stock > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart(item.productId._id);
-                      }}
-                      className={`px-4 py-2 rounded-md ${
-                        cartItems.includes(item.productId._id)
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-emerald-900 hover:bg-emerald-700 text-white"
-                      }`}
-                      disabled={cartItems.includes(item.productId._id)}
-                    >
-                      {cartItems.includes(item.productId._id) ? "In Cart" : "Add to Cart"}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleRemoveFromWishlist(item.productId._id)}
-                    className="bg-transparent hover:bg-red-600 w-8 h-8 text-black hover:text-white py-2 px-4 rounded-full flex items-center justify-center"
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center mt-20 space-y-6">
-            <div className="relative bg-red-100 rounded-full p-6">
-              <FontAwesomeIcon
-                icon={faHeart}
-                className="text-red-500 h-16 w-16 animate-pulse"
-              />
+      <main className="min-h-[calc(100vh-72px)] bg-[#f7f6f2] px-4 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col justify-between gap-5 border-b border-stone-200 pb-7 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-900">Saved for later</p>
+              <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
+                Your wishlist
+              </h1>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-stone-600">
+                Keep the watches you love close by, and move them to your bag whenever you’re ready.
+              </p>
             </div>
-            <h2 className="text-3xl font-extrabold text-gray-800 tracking-wide">
-              Your Wishlist is Empty
-            </h2>
-            <p className="text-gray-600 max-w-sm text-sm">
-              You haven't added any items to your wishlist yet. Start browsing and save your favorite products!
-            </p>
-            <button
-              onClick={() => navigate("/home")}
-              className="mt-4 px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold text-lg rounded-full shadow-lg transform hover:scale-105 hover:shadow-2xl transition duration-300 ease-in-out"
+            <Link
+              to="/shop"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-800 transition hover:border-emerald-900 hover:text-emerald-950"
             >
-              Go Back to Shopping
-            </button>
+              Explore watches <FaArrowRight aria-hidden="true" size={12} />
+            </Link>
           </div>
-        )}
-      </div>
+
+          {cartError && !error && (
+            <p role="status" className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Your wishlist loaded, but we couldn’t check which items are already in your bag.
+            </p>
+          )}
+
+          {loading ? (
+            <div className="flex min-h-72 items-center justify-center" role="status">
+              <div className="flex items-center gap-3 text-sm font-medium text-stone-600">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-emerald-900" />
+                Loading your saved watches…
+              </div>
+            </div>
+          ) : !token ? (
+            <section className="mx-auto mt-12 max-w-lg rounded-3xl border border-stone-200 bg-white px-6 py-12 text-center shadow-sm sm:mt-16 sm:px-12">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-800">
+                <FaHeart aria-hidden="true" size={21} />
+              </div>
+              <h2 className="mt-5 font-serif text-2xl font-semibold text-stone-950">Sign in to see your wishlist</h2>
+              <p className="mt-2 text-sm leading-6 text-stone-600">
+                Your saved watches are waiting for you when you sign in.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="mt-6 rounded-xl bg-emerald-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+              >
+                Sign in
+              </button>
+            </section>
+          ) : error ? (
+            <section className="mx-auto mt-12 max-w-lg rounded-3xl border border-rose-200 bg-white px-6 py-10 text-center shadow-sm">
+              <p role="alert" className="text-sm leading-6 text-rose-800">{error}</p>
+              <button
+                type="button"
+                onClick={() => setRefreshKey((key) => key + 1)}
+                className="mt-5 rounded-xl bg-emerald-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+              >
+                Try again
+              </button>
+            </section>
+          ) : productItems.length === 0 ? (
+            <section className="mx-auto mt-12 max-w-lg rounded-3xl border border-stone-200 bg-white px-6 py-12 text-center shadow-sm sm:mt-16 sm:px-12">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-800">
+                <FaHeart aria-hidden="true" size={21} />
+              </div>
+              <h2 className="mt-5 font-serif text-2xl font-semibold text-stone-950">Your wishlist is waiting</h2>
+              <p className="mt-2 text-sm leading-6 text-stone-600">
+                Save a watch that catches your eye and it will be easy to find here.
+              </p>
+              <Link
+                to="/shop"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-emerald-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+              >
+                Find your next watch <FaArrowRight aria-hidden="true" size={12} />
+              </Link>
+            </section>
+          ) : (
+            <>
+              <div className="flex items-center justify-between py-5">
+                <p className="text-sm text-stone-600">
+                  <span className="font-semibold text-stone-950">{productItems.length}</span>{' '}
+                  {productItems.length === 1 ? 'watch saved' : 'watches saved'}
+                </p>
+                <span className="hidden items-center gap-2 text-xs text-stone-500 sm:inline-flex">
+                  <FaRegClock aria-hidden="true" /> Ready whenever you are
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {productItems.map(({ productId: product }) => {
+                  const unavailable = product.isStatus || Number(product.stock) <= 0;
+                  const inCart = cartItems.includes(product._id);
+                  const processing = processingIds.includes(product._id);
+                  const image = Array.isArray(product.product_images)
+                    ? product.product_images[0]
+                    : product.product_images;
+
+                  return (
+                    <article key={product._id} className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                      <Link
+                        to={`/product/${product._id}`}
+                        aria-label={`View ${product.title}`}
+                        className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-stone-100 to-stone-200"
+                      >
+                        {image && (
+                          <img
+                            src={image}
+                            alt={product.title || 'Saved watch'}
+                            loading="lazy"
+                            onError={(event) => { event.currentTarget.style.display = 'none'; }}
+                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          />
+                        )}
+                        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-700 backdrop-blur">
+                          {unavailable ? 'Unavailable' : 'Saved'}
+                        </span>
+                      </Link>
+                      <div className="p-4 sm:p-5">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-500">
+                          {product.brand || 'Clyro collection'}
+                        </p>
+                        <Link to={`/product/${product._id}`} className="mt-2 block">
+                          <h2 className="truncate font-serif text-lg font-semibold text-stone-950 transition group-hover:text-emerald-900">
+                            {product.title || 'Watch'}
+                          </h2>
+                        </Link>
+                        <p className="mt-2 text-base font-semibold text-emerald-950">{formatPrice(product.price)}</p>
+                        <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleAddToCart(product._id)}
+                            disabled={processing || inCart || unavailable}
+                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-950 px-3 text-xs font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-500"
+                          >
+                            <FaShoppingBag aria-hidden="true" />
+                            {unavailable ? 'Unavailable' : inCart ? 'In your bag' : 'Add to bag'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemove(product._id)}
+                            disabled={processing}
+                            aria-label={`Remove ${product.title || 'watch'} from wishlist`}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-stone-200 text-stone-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:cursor-wait disabled:opacity-50"
+                          >
+                            <FaTrash aria-hidden="true" size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </main>
     </>
   );
-};
-
-export default Wishlist;
+}

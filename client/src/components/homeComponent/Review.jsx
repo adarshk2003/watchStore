@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api.js';
+import { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
 import Rating from 'react-rating-stars-component';
 import { useParams } from 'react-router-dom';
@@ -11,28 +12,28 @@ function Review() {
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const fetchReviews = async () => {
-            try {
-                const response = await axios.get(`/reviews/${sellerId}`);
-                setReviews(response.data);
-            } catch (error) {
-                setError('Failed to fetch reviews');
-            }
-        };
+    const fetchReviews = useCallback(async () => {
+        try {
+            const response = await axios.get(`/reviews/${sellerId}`);
+            setReviews(response.data);
+        } catch {
+            setError('Failed to fetch reviews');
+        }
+    }, [sellerId]);
 
+    useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('https://watchstore-backends.onrender.com/user'); 
+                const response = await axios.get(`${API_BASE_URL}/user`); 
                 setUser(response.data);
-            } catch (error) {
+            } catch {
                 setError('Failed to fetch user data');
             }
         };
 
         fetchReviews();
         fetchUserData();
-    }, [sellerId]);
+    }, [fetchReviews]);
 
     const handleRatingChange = (newRating) => {
         setRating(newRating);
@@ -41,7 +42,7 @@ function Review() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('https://watchstore-backends.onrender.com/reviews', {
+            await axios.post(`${API_BASE_URL}/reviews`, {
                 userId: user.id,
                 sellerId,
                 rating,
@@ -50,7 +51,7 @@ function Review() {
             setRating(0);
             setComment('');
             fetchReviews();
-        } catch (error) {
+        } catch {
             setError('Failed to submit review');
         }
     };

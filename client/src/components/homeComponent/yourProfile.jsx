@@ -1,291 +1,270 @@
+import { API_BASE_URL } from '../../config/api.js';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
-import { MdAccountCircle, MdEmail, MdHome, MdOutlineAdminPanelSettings } from 'react-icons/md';
+import { FaEnvelope, FaMapMarkerAlt, FaRegCalendarAlt, FaStore, FaUser } from 'react-icons/fa';
+import AccountLayout from './AccountLayout';
 
-const Profile = () => {
-  const [userData, setUserData] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    password: '',
-  });
-  const [upgradeData, setUpgradeData] = useState({
-    companyName: '',
-    license: '',
-  });
-  const [upgradeSuccessMessage, setUpgradeSuccessMessage] = useState(null);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+const roleLabels = {
+  '67587113ae9c6b1dffa1a7ef': 'Customer',
+  '675870f3ae9c6b1dffa1a7ee': 'Seller',
+  '675870dbae9c6b1dffa1a7ed': 'Administrator',
+};
 
+function Profile() {
+  const [user, setUser] = useState(null);
+  const [form, setForm] = useState({ name: '', email: '', address: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    if (token) {
-      axios
-        .get('https://watchstore-backends.onrender.com/userprofile', {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setUserData(response.data.data);
-          setFormData({
-            name: response.data.data.name,
-            email: response.data.data.email,
-            address: response.data.data.address || '',
-            password: '',
-          });
-        })
-        .catch((err) => {
-          setError(err.response ? err.response.data.message : 'Something went wrong');
+    let active = true;
+
+    async function loadProfile() {
+      if (!token) {
+        setError('Please sign in to view your account.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${API_BASE_URL}/userprofile`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-    } else {
-      setError('No token found. Please log in.');
+        if (!active) return;
+        const profile = response.data.data;
+        setUser(profile);
+        setForm({
+          name: profile.name || '',
+          email: profile.email || '',
+          address: profile.address || '',
+        });
+      } catch (requestError) {
+        if (active) {
+          setError(requestError.response?.data?.message || 'We could not load your profile. Please try again.');
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
     }
+
+    loadProfile();
+    return () => {
+      active = false;
+    };
   }, [token]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  const updateField = (event) => {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
-  const handleUpgradeInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpgradeData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  const saveProfile = async (event) => {
+    event.preventDefault();
+    setError('');
+    setSuccess('');
 
-  const handleSave = () => {
-    if (token) {
-      axios
-        .put(
-          'https://watchstore-backends.onrender.com/updateUser',
-          { ...formData },
-          {
-            headers: {
-              Authorization: `bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          setSuccessMessage('Profile updated successfully');
-          setError(null);
-          setUserData(response.data.data);
-          setEditMode(false);
-        })
-        .catch((err) => {
-          setError(err.response ? err.response.data.message : 'Something went wrong');
-        });
+    const name = form.name.trim();
+    const email = form.email.trim().toLowerCase();
+    const address = form.address.trim();
+    if (!name || name.length > 100) {
+      setError('Enter a name between 1 and 100 characters.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Enter a valid email address.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/updateUser`,
+        { name, email, address },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser(response.data.data);
+      setForm({
+        name: response.data.data.name || '',
+        email: response.data.data.email || '',
+        address: response.data.data.address || '',
+      });
+      setIsEditing(false);
+      setSuccess('Your profile was updated.');
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'We could not save your profile. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleUpgradeRequest = () => {
-    if (token) {
-      console.log('Sending upgrade request with data:', upgradeData); // Debug: Log upgrade data
-
-      axios
-        .post(
-          'https://watchstore-backends.onrender.com/requestUpgrade',
-          { ...upgradeData },
-          {
-            headers: {
-              Authorization: `bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log('Upgrade response:', response); // Debug: Log response
-          setUpgradeSuccessMessage('Upgrade request submitted successfully');
-          setError(null);
-        })
-        .catch((err) => {
-          console.error('Upgrade request error:', err); // Debug: Log error
-          setError(err.response ? err.response.data.message : 'Something went wrong');
-        });
-    }
-  };
-
-  if (error) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="bg-red-500 text-white p-4 rounded shadow-lg">
-          <h2>{error}</h2>
+      <AccountLayout activePage="profile" userType={localStorage.getItem('userType')}>
+        <div className="rounded-2xl border border-stone-200 bg-white p-8 text-stone-500" role="status">
+          Loading your profile…
         </div>
-      </div>
+      </AccountLayout>
     );
   }
 
-  if (!userData) {
+  if (!user) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="bg-gray-200 p-4 rounded shadow-lg">
-          <h2>Loading...</h2>
+      <AccountLayout activePage="profile" userType={localStorage.getItem('userType')}>
+        <div className="rounded-2xl border border-red-200 bg-white p-6 text-red-700" role="alert">
+          {error}
+          <Link to="/login" className="ml-2 font-semibold underline">Sign in</Link>
         </div>
-      </div>
+      </AccountLayout>
     );
   }
 
-  const userTypeDisplay = (type) => {
-    switch (type) {
-      case '675870f3ae9c6b1dffa1a7ee':
-        return (
-          <span className="text-yellow-400 flex items-center gap-2">
-            <MdOutlineAdminPanelSettings /> Seller
-          </span>
-        );
-      case '675870dbae9c6b1dffa1a7ed':
-        return (
-          <span className="text-red-500 flex items-center gap-2">
-            <MdOutlineAdminPanelSettings /> Admin
-          </span>
-        );
-      default:
-        return (
-          <span className="text-blue-400 flex items-center gap-2">
-            <MdAccountCircle /> Customer
-          </span>
-        );
-    }
-  };
+  const role = roleLabels[user.user_type] || 'Customer';
+  const initials = user.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('');
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-xl rounded-lg mt-10">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6 text-center">
-        {editMode ? 'Edit Profile' : 'Your Profile'}
-      </h1>
-
-      {successMessage && (
-        <div className="bg-green-500 text-white p-3 rounded mb-4 shadow">
-          {successMessage}
-        </div>
-      )}
-
-      {upgradeSuccessMessage && (
-        <div className="bg-green-500 text-white p-2 rounded mb-4">{upgradeSuccessMessage}</div>
-      )}
-
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <MdAccountCircle size={24} className="text-gray-500" />
-          <label className="font-medium">Name:</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="flex-1 border p-2 rounded text-black"
-            />
-          ) : (
-            <div className="font-semibold text-gray-800 flex-1">{userData.name}</div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <MdEmail size={24} className="text-gray-500" />
-          <label className="font-medium">Email:</label>
-          {editMode ? (
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="flex-1 border p-2 rounded text-black"
-            />
-          ) : (
-            <div className="text-gray-800 flex-1">{userData.email}</div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <MdHome size={24} className="text-gray-500" />
-          <label className="font-medium">Address:</label>
-          {editMode ? (
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              className="flex-1 border p-2 rounded text-black"
-            />
-          ) : (
-            <div className="text-gray-800 flex-1">{userData.address || 'N/A'}</div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-4">
-          <MdOutlineAdminPanelSettings size={24} className="text-gray-500" />
-          <label className="font-medium">Account Type:</label>
-          <div className="flex-1">{userTypeDisplay(userData.user_type)}</div>
-        </div>
-      </div>
-
-      {/* Show upgrade form only for customers */}
-      {userData.user_type === '67587113ae9c6b1dffa1a7ef' && !editMode && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-xl font-semibold text-gray-800">Upgrade to Seller</h2>
-          <div className="mt-4 space-y-4">
-            <div>
-              <label className="font-medium">Company Name:</label>
-              <input
-                type="text"
-                name="companyName"
-                value={upgradeData.companyName}
-                onChange={handleUpgradeInputChange}
-                className="w-full border p-2 rounded"
-              />
+    <AccountLayout activePage="profile" userType={user.user_type}>
+      <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+        <div className="h-36 bg-gradient-to-r from-emerald-950 via-emerald-900 to-stone-700 sm:h-44" />
+        <div className="px-5 pb-7 sm:px-8">
+          <div className="-mt-12 flex flex-col gap-5 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-4">
+              <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white bg-[#d6c6a5] font-serif text-3xl font-semibold text-emerald-950 shadow-sm sm:h-28 sm:w-28">
+                {initials || <FaUser aria-hidden="true" />}
+              </div>
+              <div className="pb-1">
+                <h2 className="font-serif text-2xl font-semibold text-stone-950">{user.name}</h2>
+                <p className="mt-1 text-sm text-stone-500">{role} account</p>
+              </div>
             </div>
-            <div>
-              <label className="font-medium">License:</label>
-              <input
-                type="text"
-                name="license"
-                value={upgradeData.license}
-                onChange={handleUpgradeInputChange}
-                className="w-full border p-2 rounded"
-              />
-            </div>
-            <div className="flex justify-center mt-4">
+            {!isEditing && (
               <button
-                onClick={handleUpgradeRequest}
-                className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600"
+                type="button"
+                onClick={() => { setSuccess(''); setError(''); setIsEditing(true); }}
+                className="rounded-xl bg-emerald-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
               >
-                Request Upgrade
+                Edit profile
               </button>
-            </div>
+            )}
           </div>
-        </div>
-      )}
 
-      <div className="flex justify-center space-x-4 mt-8">
-        {editMode ? (
-          <>
-            <button
-              onClick={handleSave}
-              className="flex items-center bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-            >
-              <FaSave className="mr-2" /> Save
-            </button>
-            <button
-              onClick={() => setEditMode(false)}
-              className="flex items-center bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
-            >
-              <FaTimes className="mr-2" /> Cancel
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setEditMode(true)}
-            className="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          >
-            <FaEdit className="mr-2" /> Edit Profile
-          </button>
-        )}
+          {error && <p className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{error}</p>}
+          {success && <p className="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">{success}</p>}
+
+          {isEditing ? (
+            <form onSubmit={saveProfile} className="mt-8 grid gap-5 md:grid-cols-2">
+              <label className="text-sm font-medium text-stone-700">
+                Full name
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={updateField}
+                  maxLength={100}
+                  required
+                  className="mt-2 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-900 outline-none transition focus:border-emerald-800 focus:ring-2 focus:ring-emerald-100"
+                />
+              </label>
+              <label className="text-sm font-medium text-stone-700">
+                Email address
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={updateField}
+                  required
+                  className="mt-2 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-900 outline-none transition focus:border-emerald-800 focus:ring-2 focus:ring-emerald-100"
+                />
+              </label>
+              <label className="text-sm font-medium text-stone-700 md:col-span-2">
+                Shipping address
+                <textarea
+                  name="address"
+                  value={form.address}
+                  onChange={updateField}
+                  rows={3}
+                  className="mt-2 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-900 outline-none transition focus:border-emerald-800 focus:ring-2 focus:ring-emerald-100"
+                />
+              </label>
+              <div className="flex flex-wrap gap-3 md:col-span-2">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-xl bg-emerald-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60"
+                >
+                  {saving ? 'Saving…' : 'Save changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm({ name: user.name || '', email: user.email || '', address: user.address || '' });
+                    setIsEditing(false);
+                    setError('');
+                  }}
+                  className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="mt-9 grid gap-4 md:grid-cols-2">
+              <div className="flex items-start gap-4 rounded-2xl bg-[#f7f6f2] p-5">
+                <FaEnvelope className="mt-1 text-emerald-900" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Email address</p>
+                  <p className="mt-2 break-all text-sm font-medium text-stone-800">{user.email}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 rounded-2xl bg-[#f7f6f2] p-5">
+                <FaMapMarkerAlt className="mt-1 text-emerald-900" aria-hidden="true" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Shipping address</p>
+                  <p className="mt-2 text-sm font-medium text-stone-800">{user.address || 'Add an address for faster checkout.'}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 rounded-2xl bg-[#f7f6f2] p-5">
+                <FaStore className="mt-1 text-emerald-900" aria-hidden="true" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Account type</p>
+                  <p className="mt-2 text-sm font-medium text-stone-800">{role}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 rounded-2xl bg-[#f7f6f2] p-5">
+                <FaRegCalendarAlt className="mt-1 text-emerald-900" aria-hidden="true" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Member since</p>
+                  <p className="mt-2 text-sm font-medium text-stone-800">
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long' }) : 'Clyro member'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {user.user_type === '67587113ae9c6b1dffa1a7ef' && (
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-[#e7dfd0] bg-[#fbf9f4] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <div>
+                <h3 className="font-serif text-lg font-semibold text-stone-900">Interested in selling?</h3>
+                <p className="mt-1 text-sm text-stone-500">Submit your details for seller account review.</p>
+              </div>
+              <Link to="/settings#seller-access" className="shrink-0 rounded-xl border border-emerald-900 px-4 py-3 text-center text-sm font-semibold text-emerald-950 transition hover:bg-emerald-950 hover:text-white">
+                Seller access
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </AccountLayout>
   );
-};
+}
 
 export default Profile;

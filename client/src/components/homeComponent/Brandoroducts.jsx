@@ -1,82 +1,113 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import NavBaruser from "../navComponent/userNav";
+import { API_BASE_URL } from '../../config/api.js';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import NavBaruser from '../navComponent/userNav';
 
-const BrandProducts = () => {
-  const { brandName } = useParams(); // Access the brand name from the URL
+const productsPerPage = 12;
+
+export default function BrandProducts() {
+  const { brandName } = useParams();
   const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate=useNavigate()
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch products from the /products endpoint
-    const token = localStorage.getItem('authToken'); // Get token from localStorage
-    axios
-      .get('https://watchstore-backends.onrender.com/products', {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in the header
-        },
-      })
-      .then((response) => {
-        console.log("API Response:", response.data);
-        // Assuming the response is like { success: true, statusCode: 200, data: [...] }
-        if (response.data.success) {
-          const brandProducts = response.data.data.filter(
-            (product) => product.brand.toLowerCase() === brandName.toLowerCase()
-          );
-          setProducts(brandProducts);
-        } else {
-          setError("Failed to fetch products.");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching products:", err);
-        setError("Failed to fetch products.");
-        setLoading(false);
-      });
-  }, [brandName]);
+    let active = true;
+    setLoading(true);
+    setError('');
 
-  const handleProductCardClick = (productId) => {
-    navigate(`/product/${productId}`, { replace: false });
-  };
-  // Handle loading, error, or empty products
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
-  if (products.length === 0) return <div>No products found for this brand.</div>;
+    axios.get(`${API_BASE_URL}/products`, {
+      params: {
+        page,
+        limit: productsPerPage,
+        availableOnly: true,
+        brand: brandName,
+      },
+    })
+      .then((response) => {
+        if (!Array.isArray(response.data?.data) || !response.data?.pagination) {
+          throw new Error('The product response was not in the expected format.');
+        }
+        if (active) {
+          setProducts(response.data.data);
+          setTotalPages(response.data.pagination.totalPages);
+        }
+      })
+      .catch((requestError) => {
+        console.error('Error fetching brand products:', requestError);
+        if (active) setError(requestError.response?.data?.message || 'Failed to fetch products.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [brandName, page]);
 
   return (
     <>
-    <NavBaruser/>
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">{brandName} Products</h2>
-      <div className="grid grid-cols-3 gap-4">
-        {products.map((product) => {
-         const imageUrl =
-  product.product_images && product.product_images.length > 0
-    ? product.product_images[0]  // use the full Cloudinary URL directly
-    : 'https://via.placeholder.com/150';
-
-
-          return (
-            <div key={product._id} className="p-4 border rounded-md">
-              <img
-                src={imageUrl}
-                alt={product.title}
-                className="w-full h-auto object-cover rounded-md cursor-pointer"
-            onClick={() => handleProductCardClick(product._id)}
-              />
-              <p className="mt-2">{product.title}</p>
-              <p className="text-gray-600">{product.price}</p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
- </> );
-};
-
-export default BrandProducts;
+      <NavBaruser />
+      <main className="min-h-screen bg-[#f7f6f2] px-4 py-8 sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="mb-6 font-serif text-3xl font-semibold text-stone-950">{brandName} Watches</h1>
+          {loading ? (
+            <p className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-stone-600" role="status">Loading products...</p>
+          ) : error ? (
+            <p className="rounded-2xl border border-rose-200 bg-white p-8 text-center text-rose-800" role="alert">{error}</p>
+          ) : products.length === 0 ? (
+            <p className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-stone-600">No products found for this brand.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {products.map((product) => (
+                  <article key={product._id} className="overflow-hidden rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/product/${product._id}`)}
+                      className="w-full text-left"
+                    >
+                      <img
+                        src={product.product_images?.[0] || '/Omega.jpeg'}
+                        alt={product.title}
+                        className="h-40 w-full rounded-xl bg-[#f1eee7] object-contain p-2 sm:h-52"
+                      />
+                      <h2 className="mt-3 truncate font-serif font-semibold text-stone-950">{product.title}</h2>
+                      <p className="mt-1 text-sm font-medium text-stone-600">₹{Number(product.price || 0).toLocaleString('en-IN')}</p>
+                    </button>
+                  </article>
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <nav aria-label="Brand product pages" className="mt-7 flex items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setPage((current) => Math.max(1, current - 1))}
+                    disabled={page === 1}
+                    className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-sm text-stone-600">Page {page} of {totalPages}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                    disabled={page === totalPages}
+                    className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </nav>
+              )}
+            </>
+          )}
+        </div>
+      </main>
+    </>
+  );
+}

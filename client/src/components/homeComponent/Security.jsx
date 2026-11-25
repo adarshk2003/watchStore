@@ -1,79 +1,61 @@
-import React from 'react';
-import { motion } from 'framer-motion'; // Import framer-motion
+import { Link } from 'react-router-dom';
+import { FaArrowRight, FaBoxOpen, FaCommentDots, FaHandHoldingUsd } from 'react-icons/fa';
 
-const SecurityContent = () => {
-  // Motion variants for the icons and content
-  const iconVariants = {
-    hidden: { opacity: 0, scale: 0.5 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
-  };
+const shoppingDetails = [
+  {
+    icon: FaBoxOpen,
+    title: 'Product details up front',
+    description: 'Review the listing description, specifications, and available stock before you order.',
+  },
+  {
+    icon: FaHandHoldingUsd,
+    title: 'Pay on delivery',
+    description: 'Cash on delivery is available at checkout, so payment is collected when your order arrives.',
+  },
+  {
+    icon: FaCommentDots,
+    title: 'Help when you need it',
+    description: 'Questions about a listing or an order? Get in touch with the Clyro support team.',
+  },
+];
 
-  const contentVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
-
+export default function SecurityContent() {
   return (
-    <motion.div
-      className="top-full left-0 w-full bg-white border-slate-950  p-4 flex flex-wrap items-center justify-center"
-      style={{ transition: 'transform 0.3s ease, opacity 0.3s ease' }}
-      initial="hidden"
-      animate="visible"
-      variants={contentVariants}
-    >
-      <div className="text-center w-full">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Product Protection & Buyer Security
-        </h3>
-        <p className="text-gray-600 mb-4">
-          We understand the importance of secure shopping. All your transactions are backed with our full buyer protection policy to ensure a worry-free shopping experience.
+    <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-2xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-900">A clearer way to shop</p>
+        <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-stone-950 sm:text-4xl">
+          The details matter
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-stone-600">
+          From product information to payment and support, here are a few things to know before you choose.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          {/* Guaranteed Authenticity Section */}
-          <motion.div
-            className="bg-green-100 p-4 rounded-md shadow-md w-80 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={iconVariants}
-          >
-            <div className="text-3xl mb-2">✅</div> {/* Emoji for authenticity */}
-            <h4 className="font-semibold text-green-700">Guaranteed Authenticity</h4>
-            <p className="text-sm text-green-600">
-              We only offer verified products, ensuring 100% authenticity of every item.
-            </p>
-          </motion.div>
-
-          {/* Buyer Protection Section */}
-          <motion.div
-            className="bg-blue-100 p-4 rounded-md shadow-md w-80 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={iconVariants}
-          >
-            <div className="text-3xl mb-2">🛡️</div> {/* Emoji for protection */}
-            <h4 className="font-semibold text-blue-700">Buyer Protection</h4>
-            <p className="text-sm text-blue-600">
-              If there is any issue with your purchase, you’re covered by our easy return and refund policy.
-            </p>
-          </motion.div>
-
-          {/* Secure Payments Section */}
-          <motion.div
-            className="bg-yellow-100 p-4 rounded-md shadow-md w-80 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={iconVariants}
-          >
-            <div className="text-3xl mb-2">💳</div> {/* Emoji for secure payments */}
-            <h4 className="font-semibold text-yellow-700">Secure Payments</h4>
-            <p className="text-sm text-yellow-600">
-              All payments are encrypted and processed securely through trusted providers.
-            </p>
-          </motion.div>
-        </div>
       </div>
-    </motion.div>
-  );
-};
 
-export default SecurityContent;
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
+        {shoppingDetails.map(({ icon: Icon, title, description }) => (
+          <article key={title} className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:p-7">
+            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-900">
+              <Icon aria-hidden="true" size={19} />
+            </span>
+            <h3 className="mt-5 font-serif text-xl font-semibold text-stone-950">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-stone-600">{description}</p>
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-7 flex flex-col items-center justify-between gap-4 rounded-2xl bg-emerald-950 px-6 py-6 text-white sm:flex-row sm:px-8">
+        <div>
+          <p className="font-serif text-xl font-semibold">Need help choosing?</p>
+          <p className="mt-1 text-sm text-white/70">We’re here to help with questions about your shopping experience.</p>
+        </div>
+        <Link
+          to="/support"
+          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-50"
+        >
+          Contact support <FaArrowRight aria-hidden="true" size={12} />
+        </Link>
+      </div>
+    </div>
+  );
+}

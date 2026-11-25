@@ -14,7 +14,7 @@ function  setAccessControl(access_type){
 router.post('/users', setAccessControl('*'),userController.createUser);
 router.get('/users', setAccessControl('1'),userController.getAllUsers);
 router.get('/user/:id', userController.getSingleUser);
-router.delete('/user/:id', userController.deleteUser);
+router.delete('/user/:id', setAccessControl('1'), userController.deleteUser);
 router.get('/userprofile', userController.viewUserProfile);
 router.put('/updateUser',userController.updateUser)
 router.post('/block', setAccessControl('1'), userController.blockUser);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api.js';
+import { useState, useEffect } from 'react';
 import { FaBell } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -14,7 +15,7 @@ const NotificationPage = () => {
         const newNotifications = [];
 
         // Fetch products
-        const productsResponse = await axios.get('https://watchstore-backends.onrender.com/products');
+        const productsResponse = await axios.get(`${API_BASE_URL}/products`);
         const products = productsResponse.data.data;
 
         console.log('Products Data:', products);
@@ -41,7 +42,11 @@ const NotificationPage = () => {
         }
 
         // Fetch orders
-        const ordersResponse = await axios.get('https://watchstore-backends.onrender.com/viewAllOrders');
+        const ordersResponse = await axios.get(`${API_BASE_URL}/viewAllOrders`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
         const orders = ordersResponse.data.data;
 
         console.log('Orders Data:', orders);

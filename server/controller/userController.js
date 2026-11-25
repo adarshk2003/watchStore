@@ -18,11 +18,9 @@ const jwt = require('jsonwebtoken');
 
 const authenticate = (req, res, next) => {
     const authorizationHeader = req.header('Authorization');
-    console.log("Authorization Header:", authorizationHeader);
 
     // Extract token from header
     const token = authorizationHeader?.replace(/^Bearer\s+/i, '').trim();
-    console.log("Extracted Token:", token);
 
     if (!token) {
         return res.status(401).json({ message: "No token provided. Please log in." });
@@ -31,7 +29,6 @@ const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.PRIVATE_KEY);
         req.user = { id: decoded.user_id }; // Add user ID to the request
-        console.log("Decoded User ID:", req.user.id);
         next(); // Proceed to the next middleware/controller
     } catch (error) {
         console.error("Token Verification Error:", error.message);
@@ -41,102 +38,90 @@ const authenticate = (req, res, next) => {
 
 exports.createUser = async function (req, res) {
     try {
+        const name = typeof req.body.name === 'string' ? req.body.name.trim() : '';
+        const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+        const password = req.body.password;
 
-        let body = req.body;
-        console.log("body : ", body);
-
-
-        let name = req.body.name;
-        console.log("name : ", name);
-
-        let email = req.body.email;
-        console.log("email : ", email);
-
-        let age = req.body.age;
-        console.log("age : ", age);
-
-        let password = req.body.password;
-        console.log("password : ", password);
-
-        let isSeller=req.body.isSeller;
-        console.log("seller",isSeller)
-
-        if (isSeller === true) {
-            console.log("seller")
-            body.user_type ='675870f3ae9c6b1dffa1a7ee' ;
-        } else {
-            console.log("buyer")
-            body.user_type ='67587113ae9c6b1dffa1a7ef';
-        }
-       
-        if (!name) {
-
-            let response = error_function({
+        if (!name || name.length > 100) {
+            return res.status(400).send(error_function({
                 statusCode: 400,
-                message: "Name is required",
-            });
-
-            res.status(response.statusCode).send(response);
-            return;
+                message: "Name is required and must be 100 characters or fewer.",
+            }));
         }
-
-
-       
-
-
-        //Password Hashing
-        let salt = bcrypt.genSaltSync(10);
-        console.log("salt : ", salt);
-
-        let hashed_password = bcrypt.hashSync(password, salt);
-        console.log("hashed_password : ", hashed_password);
-
-        let count = await users.countDocuments({ email });
-        console.log("count : ", count);
-
-        if (count > 0) {
-            let response = error_function({
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+            return res.status(400).send(error_function({
                 statusCode: 400,
-                message: "User already exists",
-            });
-
-            res.status(response.statusCode).send(response);
-            return
+                message: "Enter a valid email address.",
+            }));
         }
-
-        body.password = hashed_password;
-        console.log("body : ", body);
-        
-        let new_user = await users.create(body);
-
-        if (new_user) {
-
-            let response = success_function({
-                statusCode: 201,
-                message: "User created successfully",
-            });
-
-            res.status(response.statusCode).send(response);
-            return;
-        } else {
-
-            let response = error_function({
+        if (typeof password !== 'string' || password.length < 8 || password.length > 128) {
+            return res.status(400).send(error_function({
                 statusCode: 400,
-                message: "User creation failed",
-            })
-            res.status(response.statusCode).send(response);
-            return;
+                message: "Password must be between 8 and 128 characters.",
+            }));
         }
+        if (!process.env.PRIVATE_KEY) {
+            throw new Error('PRIVATE_KEY must be configured to register users.');
+        }
+
+        const existingUser = await users.findOne({ email })
+            .collation({ locale: 'en', strength: 2 })
+            .select('_id')
+            .lean();
+        if (existingUser) {
+            return res.status(409).send(error_function({
+                statusCode: 409,
+                message: "An account with this email already exists.",
+            }));
+        }
+
+        const hashedPasswordPromise = bcrypt.hash(password, 12);
+        let defaultUserType = '67587113ae9c6b1dffa1a7ef';
+        try {
+            const foundType = await user_type.findOne({ user_type: 'buyer' });
+            if (foundType?._id) defaultUserType = foundType._id;
+        } catch {
+            // fallback to default
+        }
+        const hashedPassword = await hashedPasswordPromise;
+
+        const new_user = await users.create({
+            name,
+            email,
+            password: hashedPassword,
+            user_type: defaultUserType,
+        });
+
+        const token = jwt.sign(
+            { user_id: new_user._id, role: 'buyer' },
+            process.env.PRIVATE_KEY,
+            { expiresIn: "100d" }
+        );
+        const response = success_function({
+            statusCode: 201,
+            data: {
+                token,
+                _id: new_user._id,
+                user_type: new_user.user_type,
+                role: 'buyer',
+            },
+            message: "User created successfully",
+        });
+        res.status(response.statusCode).send(response);
+        return;
 
     } catch (error) {
-        console.log("error : ", error);
-
-
-        let response = error_function({
-            statusCode: 400,
-            message: error.message ? error.message : "Something went wrong",
-        })
-
+        if (error.code === 11000) {
+            return res.status(409).send(error_function({
+                statusCode: 409,
+                message: "An account with this email already exists.",
+            }));
+        }
+        console.error("User registration failed:", error);
+        const response = error_function({
+            statusCode: 500,
+            message: "Unable to create the account.",
+        });
         res.status(response.statusCode).send(response);
         return;
     }
@@ -144,8 +129,95 @@ exports.createUser = async function (req, res) {
 
 exports.getAllUsers = async function (req, res) {
     try {
-        let usersData = await users.find();
-        console.log("usersData : ", usersData);
+        const hasPagination = Object.prototype.hasOwnProperty.call(req.query, 'page') ||
+            Object.prototype.hasOwnProperty.call(req.query, 'limit');
+        if (hasPagination) {
+            const page = Number(req.query.page ?? 1);
+            const limit = Number(req.query.limit ?? 25);
+            if (!Number.isSafeInteger(page) || page < 1) {
+                return res.status(400).json({ message: 'Page must be a positive integer.' });
+            }
+            if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+                return res.status(400).json({ message: 'Limit must be an integer between 1 and 100.' });
+            }
+
+            const roleTypes = await user_type.find({
+                user_type: { $in: ['admin', 'seller', 'buyer'] },
+            }).lean();
+            const roleId = Object.fromEntries(
+                roleTypes.map((role) => [role.user_type, role._id])
+            );
+            roleId.customer = roleId.buyer;
+            const adminId = roleId.admin;
+            if (!adminId) {
+                return res.status(500).json({ message: 'The admin account role is not configured.' });
+            }
+            const baseFilter = { user_type: { $ne: adminId } };
+
+            if (req.query.role === 'seller' || req.query.role === 'customer') {
+                const requestedRoleId = roleId[req.query.role];
+                if (!requestedRoleId) {
+                    return res.status(500).json({ message: `The ${req.query.role} account role is not configured.` });
+                }
+                baseFilter.user_type = requestedRoleId;
+            } else if (req.query.role && req.query.role !== 'all') {
+                return res.status(400).json({ message: 'Role must be all, seller, or customer.' });
+            }
+
+            if (req.query.status === 'blocked') baseFilter.isBlocked = true;
+            else if (req.query.status === 'active') baseFilter.isBlocked = { $ne: true };
+            else if (req.query.status && req.query.status !== 'all') {
+                return res.status(400).json({ message: 'Status must be all, active, or blocked.' });
+            }
+
+            if (req.query.q !== undefined) {
+                if (typeof req.query.q !== 'string' || req.query.q.trim().length > 100) {
+                    return res.status(400).json({ message: 'Search text must be 100 characters or fewer.' });
+                }
+                const search = req.query.q.trim();
+                if (search) {
+                    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const roleMatches = ['seller', 'customer']
+                        .filter((name) => name.includes(search.toLowerCase()))
+                        .map((name) => roleId[name])
+                        .filter(Boolean);
+                    baseFilter.$or = [
+                        { name: { $regex: escapedSearch, $options: 'i' } },
+                        { email: { $regex: escapedSearch, $options: 'i' } },
+                        ...(roleMatches.length ? [{ user_type: { $in: roleMatches } }] : []),
+                    ];
+                }
+            }
+
+            const [usersData, totalItems, managedTotal, sellers, customers, blocked] = await Promise.all([
+                users.find(baseFilter)
+                    .sort({ createdAt: -1, _id: -1 })
+                    .skip((page - 1) * limit)
+                    .limit(limit)
+                    .lean(),
+                users.countDocuments(baseFilter),
+                users.countDocuments({ user_type: { $ne: adminId } }),
+                roleId.seller ? users.countDocuments({ user_type: roleId.seller }) : 0,
+                roleId.customer ? users.countDocuments({ user_type: roleId.customer }) : 0,
+                users.countDocuments({ user_type: { $ne: adminId }, isBlocked: true }),
+            ]);
+
+            return res.status(200).json({
+                success: true,
+                statusCode: 200,
+                data: usersData,
+                message: 'Users fetched successfully',
+                pagination: {
+                    page,
+                    limit,
+                    totalItems,
+                    totalPages: Math.ceil(totalItems / limit),
+                },
+                summary: { total: managedTotal, sellers, customers, blocked },
+            });
+        }
+
+        const usersData = await users.find().lean();
 
         let response = success_function({
             statusCode: 200,
@@ -169,13 +241,25 @@ exports.getAllUsers = async function (req, res) {
     }
 }
 
-exports.getSingleUser = async function (req, res) {
+exports.getSingleUser = [authenticate, async function (req, res) {
     try {
         let id = req.params.id;
-        console.log("id : ", id);
 
-        let userData = await users.find({ _id: id });
-        console.log("userData : ", userData);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid user ID." });
+        }
+
+        if (id !== String(req.user.id)) {
+            const requestingUser = await users.findById(req.user.id)
+                .populate('user_type')
+                .select('user_type');
+
+            if (requestingUser?.user_type?.user_type !== 'admin') {
+                return res.status(403).json({ message: "Not allowed to access this user." });
+            }
+        }
+
+        const userData = await users.find({ _id: id }).lean();
 
         let response = success_function({
             statusCode: 200,
@@ -197,7 +281,7 @@ exports.getSingleUser = async function (req, res) {
         res.status(response.statusCode).send(response);
         return;
     }
-}
+}];
 
 exports.deleteUser=async function (req,res) {
     try {
@@ -205,19 +289,19 @@ exports.deleteUser=async function (req,res) {
         
         let deleteuser=await users.deleteOne({_id:id});
 
-        if(deleteuser){
+        if(deleteuser.deletedCount > 0){
             let response=success_function({
                 statusCode:200,
                 message:"User deleted successfully"
             });
-            res.status(response.statusCode).send(response.statusCode);  
+            res.status(response.statusCode).send(response);
         }
         else{
             let response=error_function({
                 statusCode:400,
                 message:"failed to delete"
             });
-            res.status(response.statusCode).send(response.statusCode);
+            res.status(response.statusCode).send(response);
         }
     }
     
@@ -227,7 +311,7 @@ exports.deleteUser=async function (req,res) {
             statusCode : 400,
             message : error.message ? error.message : "something went wrong"
         })
-        res.status(response.statusCode).send(response.statusCode);   
+        res.status(response.statusCode).send(response);   
     }
 }
 // Controller function to view the logged-in user's profile
@@ -237,7 +321,7 @@ exports.viewUserProfile = [authenticate,async function (req, res) {
         const userId = req.user.id;
 
         // Fetch the logged-in user's profile from the database using their user ID
-        let userData = await users.findById(userId);
+        const userData = await users.findById(userId).lean();
 
         if (!userData) {
             return res.status(404).json({ message: "User not found." });
@@ -272,36 +356,46 @@ exports.updateUser = [authenticate, async function (req, res) {
         const userId = req.user.id;
 
         // Fetch the request body
-        const { name, email,  address } = req.body;
+        const { name, email, address } = req.body;
         const updateFields = {};
 
         // Validate the fields and only update if provided
-        if (name) {
-            if (!/^[a-zA-Z]+([ '-][a-zA-Z]+)*$/.test(name)) {
+        if (name !== undefined) {
+            const normalizedName = typeof name === 'string' ? name.trim() : '';
+            if (
+                normalizedName.length === 0 ||
+                normalizedName.length > 100 ||
+                !/^[a-zA-Z]+([ '-][a-zA-Z]+)*$/.test(normalizedName)
+            ) {
                 return res.status(400).json({ message: "Invalid name format" });
             }
-            updateFields.name = name;
+            updateFields.name = normalizedName;
         }
 
         if (email) {
-            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            const normalizedEmail = email.trim().toLowerCase();
+            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(normalizedEmail)) {
                 return res.status(400).json({ message: "Invalid email format" });
             }
             // Check if email is already in use by another user
-            const emailExists = await users.findOne({ email, _id: { $ne: userId } });
+            const escapedEmail = normalizedEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const emailExists = await users.findOne({
+                email: new RegExp(`^${escapedEmail}$`, 'i'),
+                _id: { $ne: userId },
+            });
             if (emailExists) {
                 return res.status(400).json({ message: "Email is already in use" });
             }
-            updateFields.email = email;
+            updateFields.email = normalizedEmail;
         }
 
        
         // Address validation (if provided)
-        if (address) {
-            if (typeof address !== "string" || address.trim().length === 0) {
+        if (address !== undefined) {
+            if (typeof address !== "string" || address.trim().length > 500) {
                 return res.status(400).json({ message: "Invalid address" });
             }
-            updateFields.address = address.trim(); // Sanitize the input
+            updateFields.address = address.trim();
         }
 
         // If no fields to update are provided
@@ -509,7 +603,9 @@ exports.approveUpgrade = [authenticate, async (req, res) => {
 //view request upgrades
 exports.getAllUpgradeRequests =[authenticate, async (req, res) => { 
     try { 
-        const requests = await UpgradeRequest.find().populate('userId', 'name email'); 
+        const requests = await UpgradeRequest.find()
+            .populate('userId', 'name email')
+            .lean();
         res.status(200).send({ message: 'Upgrade requests fetched successfully', data: requests });
     } 
     catch (error) 

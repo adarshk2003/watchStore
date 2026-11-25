@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCog, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faSignOutAlt, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE_URL } from '../../config/api.js';
 import axios from 'axios';
 
 function ProfileDropdownAdmin() {
@@ -9,62 +10,67 @@ function ProfileDropdownAdmin() {
   const [userName, setUserName] = useState('');
   const navigate = useNavigate();
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('authToken');
-      const userId = localStorage.getItem('userId');
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-      try {
-        // Fetch user details
-        const response = await axios.get(`https://watchstore-backends.onrender.com/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const userData = response.data.data[0];
-        setUserName(userData.name);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    const token = localStorage.getItem('authToken');
+    const userId = localStorage.getItem('userId');
+    if (!token || !userId) return undefined;
 
-    fetchUserData();
+    let active = true;
+    axios.get(`${API_BASE_URL}/user/${userId}`, {
+      headers: { Authorization: `bearer ${token}` },
+    })
+      .then((response) => {
+        if (active) setUserName(response.data?.data?.[0]?.name || '');
+      })
+      .catch((error) => console.error('Error fetching administrator data:', error));
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const logout = () => {
     localStorage.removeItem('authToken');
-    navigate('/');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userType');
+    setIsOpen(false);
+    navigate('/login', { replace: true });
   };
 
-
   return (
-    <div className="relative inline-block text-left">
-      <div onClick={toggleDropdown} className="flex items-center cursor-pointer">
-        <FontAwesomeIcon icon={faUser} className="text-lg m-2" />
-      </div>
+    <div className="relative">
+      <button
+        type="button"
+        aria-label="Open administrator account menu"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex items-center gap-2 rounded-full border border-stone-200 bg-white py-1.5 pl-1.5 pr-3 text-sm font-medium text-stone-700 shadow-sm transition hover:border-emerald-800 hover:text-emerald-950"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950 text-xs font-semibold text-white">
+          {userName ? userName.trim().charAt(0).toUpperCase() : <FontAwesomeIcon icon={faUser} />}
+        </span>
+        <span className="max-w-24 truncate">{userName || 'Account'}</span>
+      </button>
 
       {isOpen && (
-        <div className="absolute -right-32 mt-2 w-56 bg-white border rounded-md shadow-lg z-50">
-          <div className="px-4 py-2 text-gray-800">
-            {userName ? `Hi, ${userName}!` : 'Hi, User!'}
+        <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-stone-200 bg-white py-2 shadow-xl">
+          <div className="border-b border-stone-100 px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-900">Administrator</p>
+            <p className="mt-1 truncate text-sm font-semibold text-stone-900">{userName || 'Welcome to Clyro'}</p>
           </div>
-          <Link to="/profile" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <FontAwesomeIcon icon={faUser} className="mr-2" />
-            Profile
+          <Link to="/profile" role="menuitem" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-50 hover:text-emerald-950">
+            <FontAwesomeIcon icon={faUser} className="w-4" /> Profile
           </Link>
-          <a
-            href="#"
-            className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100"
-            onClick={logout}
-          >
-            <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-            Logout
-          </a>
+          <Link to="/settings" role="menuitem" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-50 hover:text-emerald-950">
+            <FontAwesomeIcon icon={faCog} className="w-4" /> Settings
+          </Link>
+          <Link to="/alluser" role="menuitem" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-50 hover:text-emerald-950">
+            <FontAwesomeIcon icon={faUsers} className="w-4" /> Manage users
+          </Link>
+          <button type="button" role="menuitem" onClick={logout} className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium text-rose-700 transition hover:bg-rose-50">
+            <FontAwesomeIcon icon={faSignOutAlt} className="w-4" /> Sign out
+          </button>
         </div>
       )}
     </div>

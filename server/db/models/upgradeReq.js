@@ -8,4 +8,6 @@ const UpgradeRequestSchema = new mongoose.Schema({
   status: { type: String, default: 'pending' },
 });
 
+UpgradeRequestSchema.index({ userId: 1, status: 1 });
+
 module.exports = mongoose.model('UpgradeRequest', UpgradeRequestSchema);

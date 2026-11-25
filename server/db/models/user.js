@@ -9,11 +9,31 @@ const user = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
+        trim: true,
     },
     password: {
         type: String,
         required: true,
+        select: false,
+    },
+    passwordResetOtpHash: {
+        type: String,
+        select: false,
+    },
+    passwordResetOtpExpiresAt: {
+        type: Date,
+        select: false,
+    },
+    passwordResetOtpSentAt: {
+        type: Date,
+        select: false,
+    },
+    passwordResetOtpAttempts: {
+        type: Number,
+        default: 0,
+        select: false,
     },
     address:{
         type:String,
@@ -32,4 +52,12 @@ const user = new mongoose.Schema({
         default: false,
     },
 },{ timestamps: true });
+
+user.index({ createdAt: -1, _id: -1 });
+user.index({ user_type: 1, isBlocked: 1, createdAt: -1, _id: -1 });
+user.index(
+    { email: 1 },
+    { name: 'email_ci_lookup', collation: { locale: 'en', strength: 2 } }
+);
+
 module.exports = mongoose.model("users", user);

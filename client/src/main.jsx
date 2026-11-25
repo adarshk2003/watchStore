@@ -5,6 +5,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import './index.css'
 
+if (localStorage.getItem('reduceMotion') === 'true') {
+  document.documentElement.dataset.reduceMotion = 'true';
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

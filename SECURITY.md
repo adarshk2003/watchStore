@@ -1,21 +1,16 @@
 # Security Policy
 
-## Supported Versions
+## Reporting Security Issues
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+We take the security of Clyro Watches and our users' data seriously. If you discover a security vulnerability, please do not disclose it publicly or open a public issue.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+### Contact
+Please send vulnerability reports directly to the maintainers or security contact with:
+- Detailed steps to reproduce the issue
+- Potential impact and affected endpoints
+- A proof of concept (if applicable)
 
-## Reporting a Vulnerability
-
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+### Security Practices
+- **Authentication**: JWT-based bearer authentication with cryptographically hashed passwords (`bcryptjs`).
+- **Authorization**: Role-based access control protecting customer, seller, and administrator capabilities.
+- **Data Protection**: Sensitive environment variables and secrets are kept in isolated runtime configurations and excluded from version control.

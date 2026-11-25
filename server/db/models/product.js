@@ -53,7 +53,22 @@ const product = new mongoose.Schema({
     },
     waterResestence: {
         type: Number,
-        required: true,
+        required: false,
+    },
+    waterResistance: {
+        type: Number,
+        required: false,
+    },
+    ratingsAverage: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+    },
+    ratingsCount: {
+        type: Number,
+        default: 0,
+        min: 0,
     },
     crystal: {
         type: String,
@@ -69,8 +84,13 @@ const product = new mongoose.Schema({
     },
     isStatus: {
         type: Boolean,
-        default: 'false'
+        default: false,
     },
 }, { timestamps: true });
+
+product.index({ seller: 1 });
+product.index({ createdAt: -1, _id: -1 });
+product.index({ category: 1, createdAt: -1, _id: -1 });
+product.index({ brand: 1, createdAt: -1, _id: -1 });
 
 module.exports = mongoose.model("products", product);

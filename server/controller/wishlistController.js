@@ -8,9 +8,7 @@ const error_function = require('../utils/response-handler').error_function;
 // Authentication middleware
 const authenticate = (req, res, next) => {
   const authorizationHeader = req.header('Authorization');
-    console.log(authorizationHeader);
   const token = authorizationHeader?.replace(/^Bearer\s+/i, '').trim();
-  console.log("extracted token : ", token);
 
   if (!token) {
     return res.status(401).json({ message: "No token found. Please login." });
@@ -72,7 +70,9 @@ exports.getWishlist = [
     try {
       const userId = req.user.id;
 
-      const wishlist = await Wishlist.findOne({ userId }).populate('fav.productId');
+      const wishlist = await Wishlist.findOne({ userId })
+        .populate('fav.productId', 'title brand price stock product_images isStatus')
+        .lean();
       if (!wishlist || wishlist.fav.length === 0) {
         return res.status(200).json({ message: 'Wishlist is empty.', items: [] });
       }

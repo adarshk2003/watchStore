@@ -23,4 +23,6 @@ const cart=new mongoose.Schema({
     ],
 });
 
+cart.index({ userId: 1 });
+
 module.exports=mongoose.model("cart",cart)

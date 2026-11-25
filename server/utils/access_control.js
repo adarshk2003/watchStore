@@ -8,14 +8,11 @@ const users = require("../db/models/user");
 
 exports.accessControl= async function (access_types,req,res,next) {
     try{
-        console.log(access_types);
-
         if (access_types==="*"){
             return next();
         }
 
         const auth_header=req.headers['authorization'];
-        console.log(auth_header);
 
         if(!auth_header){
             let response=error_function({
@@ -25,7 +22,6 @@ exports.accessControl= async function (access_types,req,res,next) {
             return res.status(response.statusCode).send (response);
         }
         const token =auth_header.split(" ")[1];
-        console.log(token);
 
         if(!token||token==='null'||token==='undefined'){
             let response=error_function({
@@ -43,10 +39,7 @@ exports.accessControl= async function (access_types,req,res,next) {
                 });
                 return res.status(response.statusCode).send(response);
             }
-            console.log("decoded",decode);
-
             let user=await users.findOne({_id:decode.user_id}).populate("user_type");
-            console.log(user);
 
             if(!user){
                 let response=error_function({
@@ -66,10 +59,8 @@ exports.accessControl= async function (access_types,req,res,next) {
             }
 
             let user_type=user.user_type.user_type;
-            console.log("user type:",user_type);
 
             let allowed=access_types.split(",").map((obj)=>control_data[obj]);
-            console.log("allowed",allowed);
 
             if(allowed && allowed.includes(user_type)){
                 return next();

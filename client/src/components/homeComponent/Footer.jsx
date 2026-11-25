@@ -1,68 +1,71 @@
-import React from 'react';
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
-function Footer() {
-    return (
-        <footer className="bg-emerald-900 text-white py-8">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-wrap -mx-4">
-                    <div className="w-full md:w-1/4 px-4 mb-4">
-                        <h4 className="text-lg font-bold mb-2 font-mono">CLYRO</h4>
-                        <ul>
-                            <li><a href="#" className="text-gray-300 font-mono hover:text-white">About Us</a></li>
-                        </ul>
-                    </div>
-                    <div className="w-full md:w-1/4 px-4 mb-4">
-                        <h4 className="text-lg font-bold mb-2 font-mono">Shop</h4>
-                        <ul>
-                            <li><a href="#" className="text-gray-300 hover:text-white">New Arrivals</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Best Sellers</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Sale</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Gift Cards</a></li>
-                        </ul>
-                    </div>
-                    <div className="w-full md:w-1/4 px-4 mb-4">
-                        <h4 className="text-lg font-bold mb-2">Categories</h4>
-                        <ul>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Men</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Women</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">brands</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white">Collections</a></li>
-                        </ul>
-                    </div>
-                    <div className="w-full md:w-1/4 px-4 mb-4">
-                        <h4 className="text-lg font-bold mb-2">Follow Us</h4>
-                        <div className="flex space-x-4">
-                            <a href="#" className="text-gray-300 hover:text-blue-400"> <FaFacebookF /> </a>
-                            <a href="#" className="text-gray-300 hover:text-blue-300"> <FaTwitter /> </a>
-                            <a href="#" className="text-gray-300 hover:text-pink-300"> <FaInstagram /> </a>
-                            <a href="#" className="text-gray-300 hover:text-blue-300"> <FaLinkedinIn /> </a>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex flex-wrap items-center mt-4">
-                    <div className="w-full md:w-1/2 px-4 mb-4 md:mb-0">
-                        <div className="text-7xl font-bold font-russo-one">CLYRO</div>
-                    </div>
-                    <div className="w-full md:w-1/2 px-4">
-                        <form className="flex">
-                            <input type="email" placeholder="Your Email" required className="w-full p-2 bg-transparent border-b rounded-l-md focus:outline-none" />
-                            <button type="submit" className=" text-white p-2  bg-transparent rounded-r-md hover:bg-emerald-950">OK</button>
-                        </form>
-                    </div>
-                </div>
-                <div className="flex flex-wrap items-center mt-4">
-                    <div className="w-full md:w-1/2 px-4 mb-4 md:mb-0">
-                        <p>&copy; 2024 CLYRO. All Rights Reserved.</p>
-                    </div>
-                    <div className="w-full md:w-1/2 px-4 flex justify-end space-x-4">
-                        <a href="#" className="text-gray-300 hover:text-white">Privacy Policy</a>
-                        <a href="#" className="text-gray-300 hover:text-white">Terms & Conditions</a>
-                        <a href="#" className="text-gray-300 hover:text-white">Cookie Policy</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    );
+import { Link } from 'react-router-dom';
+import { FaArrowRight } from 'react-icons/fa';
+import PropTypes from 'prop-types';
+
+const linkClass = 'text-sm text-white/65 transition hover:text-white';
+
+export default function Footer() {
+  return (
+    <footer className="bg-emerald-950 text-white">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8 sm:py-14 lg:px-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="max-w-sm">
+            <Link to="/home" className="inline-flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white font-serif text-lg font-bold text-emerald-950">C</span>
+              <span className="font-serif text-xl font-bold tracking-[0.18em]">CLYRO</span>
+            </Link>
+            <p className="mt-4 text-sm leading-6 text-white/65">
+              Discover watches with character, and find a timepiece that feels like your own.
+            </p>
+            <Link to="/shop" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white transition hover:text-emerald-200">
+              Explore the collection <FaArrowRight aria-hidden="true" size={12} />
+            </Link>
+          </div>
+
+          <FooterLinks title="Discover" links={[
+            { label: 'Shop all watches', to: '/shop' },
+            { label: 'Browse brands', to: '/shop' },
+            { label: 'Wishlist', to: '/wishlist' },
+          ]} />
+          <FooterLinks title="Your account" links={[
+            { label: 'My profile', to: '/profile' },
+            { label: 'My orders', to: '/orders' },
+            { label: 'Shopping bag', to: '/cart' },
+          ]} />
+          <FooterLinks title="We can help" links={[
+            { label: 'Contact support', to: '/support' },
+            { label: 'Cookie policy', to: '/cookies' },
+            { label: 'Privacy policy', to: '/privacy' },
+            { label: 'Terms & conditions', to: '/terms' },
+          ]} />
+        </div>
+
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/15 pt-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Clyro. All rights reserved.</p>
+          <p>Thoughtful watches. A more personal way to shop.</p>
+        </div>
+      </div>
+    </footer>
+  );
 }
 
-export default Footer;
+function FooterLinks({ title, links }) {
+  return (
+    <div>
+      <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-white/90">{title}</h2>
+      <ul className="mt-4 space-y-3">
+        {links.map(({ label, to }) => (
+          <li key={label}><Link to={to} className={linkClass}>{label}</Link></li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+FooterLinks.propTypes = {
+  title: PropTypes.string.isRequired,
+  links: PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    to: PropTypes.string.isRequired,
+  })).isRequired,
+};

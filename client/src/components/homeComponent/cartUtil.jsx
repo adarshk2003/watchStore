@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api.js';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -6,7 +7,6 @@ export const addToCart = async (productId) => {
   try {
     // Retrieve the authentication token
     const token = localStorage.getItem("authToken");
-    console.log("Token in addToCart:", token);
 
     // Check if the token is available
     if (!token) {
@@ -16,7 +16,7 @@ export const addToCart = async (productId) => {
 
     // Make the POST request to add the product to the cart
     const response = await axios.post(
-      "https://watchstore-backends.onrender.com/addCart",
+      `${API_BASE_URL}/addCart`,
       { productId },
       {
         headers: {

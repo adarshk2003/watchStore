@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../config/api.js';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import NavSellerCom from './NavSellerCom';
-const baseUrl = 'https://watchstore-backends.onrender.com';
+const baseUrl = API_BASE_URL;
 
 function SingleProductSeller() {
   const { id } = useParams();
@@ -34,9 +35,10 @@ function SingleProductSeller() {
   const fetchSimilarProducts = async (category) => {
     try {
       console.log(`Fetching similar products for category: ${category}`);
-      const response = await axios.get(`${baseUrl}/products/category/${category}`);
-      const filteredProducts = response.data.data.filter((product) => !product.isStatus);
-      setSimilarProducts(filteredProducts || []);
+      const response = await axios.get(`${baseUrl}/products/category/${encodeURIComponent(category)}`, {
+        params: { page: 1, limit: 8, availableOnly: true },
+      });
+      setSimilarProducts(response.data.data || []);
     } catch (err) {
       console.error('Error fetching similar products:', err);
     }
